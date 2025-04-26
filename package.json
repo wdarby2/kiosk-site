@@ -1,0 +1,29 @@
+{
+  "name": "kiosk-site",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "devDependencies": {
+    "@types/node": "^22.15.2",
+    "@typescript-eslint/eslint-plugin": "^8.31.0",
+    "@typescript-eslint/parser": "^8.31.0",
+    "eslint": "^9.25.1",
+    "eslint-config-prettier": "^10.1.2",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wdarby2/kiosk-site.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wdarby2/kiosk-site/issues"
+  },
+  "homepage": "https://github.com/wdarby2/kiosk-site#readme"
+}

@@ -149,34 +149,6 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         </div>
       )}
 
-      {/* Play indicator */}
-      {isActive && (
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '64px',
-          height: '64px',
-          backgroundColor: 'rgba(255,255,255,0.2)',
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          opacity: videoState.isPlaying ? 0 : 0.8,
-          transition: `opacity ${TIMING.standard}ms ${EASING.easeOut}`,
-          zIndex: 2, // Ensure play indicator is above video
-        }}>
-          <div style={{
-            width: 0,
-            height: 0,
-            borderTop: '12px solid transparent',
-            borderBottom: '12px solid transparent',
-            borderLeft: '20px solid #fff',
-            marginLeft: '5px',
-          }}></div>
-        </div>
-      )}
 
       {/* Animation keyframes */}
       <style>{`

@@ -28,95 +28,32 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
   const [videoRef, videoState, videoControls] = useVideoPlayback(
     sprite.filename,
     {
-      autoPlay,
+      autoPlay: true, // Always autoplay
       loop: true,
       muted: false, // Fullscreen videos should have sound
       playsInline: true,
-      controls: false, // We'll implement our own controls
+      controls: false, // No controls
       forceProtocolCheck: true,
     }
   );
 
-  // Handle keyboard events for playback control
+  // Handle keyboard events for escape only (to close the video)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      switch (e.key) {
-        case ' ':
-        case 'k':
-          e.preventDefault();
-          videoControls.toggle();
-          break;
-        case 'Escape':
-          e.preventDefault();
-          onClose?.();
-          break;
-        case 'm':
-          e.preventDefault();
-          videoControls.toggleMute();
-          break;
-        case 'ArrowLeft':
-          e.preventDefault();
-          // Seek back 5 seconds
-          if (videoRef.current) {
-            const newTime = Math.max(0, videoState.currentTime - 5);
-            videoControls.seek(newTime);
-          }
-          break;
-        case 'ArrowRight':
-          e.preventDefault();
-          // Seek forward 5 seconds
-          if (videoRef.current) {
-            const newTime = Math.min(videoState.duration, videoState.currentTime + 5);
-            videoControls.seek(newTime);
-          }
-          break;
-        case 'r':
-          e.preventDefault();
-          videoControls.reset();
-          break;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose?.();
       }
+      // Track interaction on any key press to reset inactivity timer
+      handleInteraction();
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [videoControls, videoRef, videoState.currentTime, videoState.duration, onClose]);
+  }, [onClose]);
 
-  // Format time (seconds -> MM:SS format)
-  const formatTime = (seconds: number): string => {
-    if (isNaN(seconds)) return '00:00';
-    
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    
-    const minutesStr = minutes < 10 ? `0${minutes}` : `${minutes}`;
-    const secondsStr = remainingSeconds < 10 ? `0${remainingSeconds}` : `${remainingSeconds}`;
-    
-    return `${minutesStr}:${secondsStr}`;
-  };
-
-  // Calculate progress percentage
-  const progressPercentage = videoState.duration 
-    ? (videoState.currentTime / videoState.duration) * 100 
-    : 0;
-
-  // Handle seek on progress bar click
-  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Don't stop propagation - allow the click to bubble up to parent components
-    const progressBar = e.currentTarget;
-    const rect = progressBar.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const percentage = clickX / rect.width;
-    
-    if (videoRef.current && videoState.duration) {
-      const newTime = percentage * videoState.duration;
-      videoControls.seek(newTime);
-    }
-    
-    // Track interaction
-    handleInteraction();
-  };
 
   // Error state fallback
   if (videoState.hasError) {
@@ -259,9 +196,7 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
             backgroundColor: '#000',
           }}
           onClick={(e) => {
-            // Toggle playback
-            videoControls.toggle();
-            // Track interaction
+            // Just track interaction, no toggling play/pause
             handleInteraction();
           }}
         />
@@ -375,60 +310,7 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
           `}</style>
         </div>
 
-        {/* Play/pause indicator in the center */}
-        <div 
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '80px',
-            height: '80px',
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            opacity: 0,
-            transition: 'opacity 0.3s ease',
-            animation: videoState.isPlaying 
-              ? 'fadeOutAfterDelay 0.5s forwards'
-              : 'fadeIn 0.3s forwards',
-          }}
-        >
-          {videoState.isPlaying ? (
-            <div style={{
-              width: '24px',
-              height: '24px',
-              display: 'flex',
-              justifyContent: 'space-between',
-            }}>
-              <div style={{ width: '8px', height: '24px', backgroundColor: '#fff' }}></div>
-              <div style={{ width: '8px', height: '24px', backgroundColor: '#fff' }}></div>
-            </div>
-          ) : (
-            <div style={{
-              width: 0,
-              height: 0,
-              borderTop: '16px solid transparent',
-              borderBottom: '16px solid transparent',
-              borderLeft: '24px solid #fff',
-              marginLeft: '5px',
-            }}></div>
-          )}
-
-          <style>{`
-            @keyframes fadeOutAfterDelay {
-              0%, 20% { opacity: 1; }
-              100% { opacity: 0; }
-            }
-            @keyframes fadeIn {
-              0% { opacity: 0; }
-              100% { opacity: 1; }
-            }
-          `}</style>
-        </div>
-
+  
         {/* Loading indicator */}
         {!videoState.isLoaded && (
           <div style={{
@@ -462,134 +344,6 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
         )}
       </div>
 
-      {/* Video controls */}
-      <div style={{
-        backgroundColor: 'rgba(0,0,0,0.8)',
-        padding: '10px 20px',
-        color: '#fff',
-      }}>
-        {/* Progress bar */}
-        <div 
-          style={{
-            height: '6px',
-            backgroundColor: 'rgba(255,255,255,0.2)',
-            borderRadius: '3px',
-            margin: '0 0 15px',
-            position: 'relative',
-            cursor: 'pointer',
-          }}
-          onClick={handleProgressClick}
-        >
-          <div 
-            style={{
-              height: '100%',
-              width: `${progressPercentage}%`,
-              backgroundColor: '#4a90e2',
-              borderRadius: '3px',
-            }}
-          ></div>
-        </div>
-
-        {/* Controls row */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '20px',
-          }}>
-            {/* Play/Pause button */}
-            <button
-              onClick={(e) => {
-                videoControls.toggle();
-                // Track interaction
-                handleInteraction();
-              }}
-              aria-label={videoState.isPlaying ? 'Pause' : 'Play'}
-              style={{
-                backgroundColor: 'transparent',
-                border: 'none',
-                color: '#fff',
-                fontSize: '1.2rem',
-                cursor: 'pointer',
-                width: '40px',
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              {videoState.isPlaying ? (
-                <span>⏸️</span>
-              ) : (
-                <span>▶️</span>
-              )}
-            </button>
-
-            {/* Mute button */}
-            <button
-              onClick={(e) => {
-                videoControls.toggleMute();
-                // Track interaction
-                handleInteraction();
-              }}
-              aria-label={videoState.isMuted ? 'Unmute' : 'Mute'}
-              style={{
-                backgroundColor: 'transparent',
-                border: 'none',
-                color: '#fff',
-                fontSize: '1.2rem',
-                cursor: 'pointer',
-                width: '40px',
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              {videoState.isMuted ? (
-                <span>🔇</span>
-              ) : (
-                <span>🔊</span>
-              )}
-            </button>
-
-            {/* Time display */}
-            <div style={{ fontSize: '0.9rem' }}>
-              {formatTime(videoState.currentTime)} / {formatTime(videoState.duration)}
-            </div>
-          </div>
-
-          <div>
-            {/* Reset button */}
-            <button
-              onClick={(e) => {
-                videoControls.reset();
-                // Track interaction
-                handleInteraction();
-              }}
-              aria-label="Restart"
-              style={{
-                backgroundColor: 'transparent',
-                border: 'none',
-                color: '#fff',
-                fontSize: '1.2rem',
-                cursor: 'pointer',
-                width: '40px',
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <span>🔄</span>
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

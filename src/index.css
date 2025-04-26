@@ -4,10 +4,17 @@
 
 /* Additional custom styles can go here */
 body {
-  background-color: black;
-  color: white;
+  /* Temporarily using light theme for proof-of-concept for better readability */
+  background-color: white;
+  color: black;
   margin: 0;
   padding: 0;
-  overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* For the final project, we'll use this dark theme */
+.dark-theme {
+  background-color: black;
+  color: white;
+  overflow: hidden;
 }

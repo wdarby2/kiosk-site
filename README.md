@@ -4,7 +4,30 @@ A kiosk site for displaying 20 motion study sprite videos as part of a gallery i
 
 ## Project Overview
 
-This application is designed to run on a 27" iMac in Chrome kiosk mode, providing an immersive gallery experience for viewing motion study videos. The application runs completely offline from the local filesystem.
+This application is designed to run on a 27" iMac in Chrome kiosk mode, providing an immersive gallery experience for viewing motion study videos. The application runs completely offline from the local filesystem using the `file://` protocol.
+
+## Current Implementation Status
+
+**Step 0: Project Setup & File Protocol Validation (COMPLETED)**
+
+- ✅ Configured Vite for File Protocol Access
+  - Set base path to './' in vite.config.ts to ensure relative paths
+  - Disabled asset filename hashing to maintain predictable paths
+  - Created custom plugin to handle video asset copying with consistent paths
+  
+- ✅ Implemented Asset Loading Proof of Concept
+  - Created test page that loads videos via file:// protocol
+  - Validated that video playback works from filesystem
+  - Implemented correct path patterns for all resources
+  - Testing both direct video tag and JavaScript-created video elements
+
+**Next Steps:**
+1. Implement Core Video Functionality (Step 1)
+2. Create Navigation State Management (Step 2)
+3. Implement Home Grid Layout (Step 3)
+4. Build Individual Sprite Pages (Step 4)
+5. Add Transitions and Animations (Step 5)
+6. Complete Testing and Optimization (Step 6)
 
 ## Key Features
 
@@ -36,6 +59,29 @@ This application is designed to run on a 27" iMac in Chrome kiosk mode, providin
    ```
 2. Navigate to the `/dist` directory in your file browser
 3. Open `index.html` directly in Chrome (not via a server)
+
+## File Protocol Implementation Details
+
+Our implementation follows these key principles to ensure file:// protocol compatibility:
+
+1. **Relative Path References**
+   - All asset paths start with `./` (never `/` or absolute URLs)
+   - Example: `./assets/videos/sprite1.mp4`
+
+2. **Vite Configuration**
+   - Base URL set to `./` in vite.config.ts
+   - Asset filename hashing disabled for predictable paths
+   - Custom plugin that explicitly copies videos to dist folder
+
+3. **Video Loading**
+   - Simple utility function that returns filesystem-compatible paths
+   - No URL constructors or import.meta.url (which don't work with file://)
+   - Both direct video tags and JavaScript-created videos are tested
+
+4. **Testing Methodology**
+   - Each feature is verified in both dev server AND via file:// protocol
+   - Console logging for debugging file protocol issues
+   - Error states for missing files
 
 ## Implementation Documentation
 
@@ -75,19 +121,20 @@ The built files will be in the `/dist` directory, ready to be deployed directly 
     /videos       # Store all video files
     /metadata     # JSON files with sprite metadata
   /components
-    /VideoThumbnail   # Grid item component
-    /VideoFullscreen  # Individual sprite page component
-    /Grid            # Home page grid layout
-    /Navigation      # Back button + inactivity timer
+    /ProofOfConcept    # File protocol validation component
+    /VideoThumbnail    # Grid item component (upcoming)
+    /VideoFullscreen   # Individual sprite page component (upcoming)
+    /Grid             # Home page grid layout (upcoming)
+    /Navigation       # Back button + inactivity timer (upcoming)
   /hooks
-    useVideoPlayback.ts  # Video configuration hook
-    useInactivityTimer.ts # For 10-second redirect
+    useVideoPlayback.ts   # Video configuration hook (upcoming)
+    useInactivityTimer.ts # For 10-second redirect (upcoming)
   /pages
-    Home.tsx        # Grid container
-    SpritePage.tsx  # Individual video view
+    Home.tsx        # Grid container (upcoming)
+    SpritePage.tsx  # Individual video view (upcoming)
   /types           # TypeScript interfaces
-  /utils           # Helper functions
-  App.tsx          # Main application with routing
+  /utils           # Helper functions with file:// compatible paths
+  App.tsx          # Main application component
   index.tsx        # Entry point
 ```
 

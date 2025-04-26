@@ -107,48 +107,7 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         }}
       />
 
-      {/* Overlay with sprite info */}
-      <div style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-        color: '#fff',
-        padding: '1rem',
-        opacity: isHovered || isActive ? 1 : 0.8,
-        transform: isHovered ? 'translateY(0)' : 'translateY(3px)',
-        transition: `
-          opacity ${TIMING.standard}ms ${EASING.easeOut},
-          transform ${TIMING.standard}ms ${EASING.easeOut}
-        `,
-      }}>
-        <h3 
-          style={{ 
-            margin: 0, 
-            fontSize: '1rem', 
-            fontWeight: 'bold',
-            transform: isHovered ? 'translateY(0)' : 'translateY(2px)',
-            transition: `transform ${TIMING.standard}ms ${EASING.easeOut}`,
-          }}
-        >
-          {sprite.title}
-        </h3>
-        <p 
-          style={{ 
-            margin: '0.25rem 0 0', 
-            fontSize: '0.8rem', 
-            opacity: isHovered ? 1 : 0.8,
-            transform: isHovered ? 'translateY(0)' : 'translateY(2px)',
-            transition: `
-              opacity ${TIMING.standard}ms ${EASING.easeOut},
-              transform ${TIMING.standard}ms ${EASING.easeOut} ${TIMING.fast}ms
-            `,
-          }}
-        >
-          {sprite.genre}
-        </p>
-      </div>
+      {/* Text overlay removed as requested */}
 
       {/* Hover overlay effect */}
       {isHovered && !isActive && (

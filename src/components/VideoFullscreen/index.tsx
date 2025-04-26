@@ -201,43 +201,44 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
           }}
         />
 
-        {/* Enhanced video info overlay at the top */}
+        {/* Metadata overlay at the bottom */}
         <div style={{
           position: 'absolute',
-          top: 0,
+          bottom: 0,
           left: 0,
           right: 0,
           padding: '30px',
-          background: 'linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.7) 40%, transparent)',
+          background: 'linear-gradient(transparent, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.9))',
           color: '#fff',
           textShadow: '0 2px 4px rgba(0,0,0,0.7)',
           zIndex: 5,
-          animation: 'fadeInDown 500ms ease-out forwards',
+          animation: 'fadeInUp 500ms ease-out forwards',
         }}>
+          {/* First row - Sprite title (larger font) */}
           <h2 style={{ 
             margin: 0, 
-            fontSize: '2rem', 
+            fontSize: '2.5rem', 
             fontWeight: 'bold',
             letterSpacing: '0.5px',
-            animation: 'slideInRight 600ms ease-out forwards',
+            marginBottom: '1rem',
+            animation: 'fadeInUp 600ms ease-out forwards',
           }}>
             {sprite.title}
           </h2>
+          
+          {/* Second row - Genre, Song Title, Methods Used */}
           <div style={{ 
-            margin: '1rem 0 0.5rem', 
-            display: 'flex', 
-            flexDirection: 'column',
-            gap: '8px',
+            display: 'flex',
+            alignItems: 'center', 
+            gap: '20px',
+            fontSize: '1.2rem',
+            opacity: 0,
+            animation: 'fadeInUp 400ms ease-out 200ms forwards',
           }}>
-            <p style={{ 
-              margin: 0, 
-              fontSize: '1.2rem',
+            <div style={{
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              opacity: 0,
-              transform: 'translateX(-20px)',
-              animation: 'slideInRight 400ms ease-out 200ms forwards',
             }}>
               <span style={{ 
                 backgroundColor: 'rgba(255, 255, 255, 0.2)', 
@@ -245,21 +246,16 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
                 borderRadius: '4px',
                 fontSize: '0.9rem',
                 opacity: 0.8,
-                transition: 'opacity 250ms ease, transform 250ms ease, background-color 250ms ease',
               }}>
                 Genre
               </span>
               <span>{sprite.genre}</span>
-            </p>
-            <p style={{ 
-              margin: 0, 
-              fontSize: '1.2rem',
+            </div>
+            
+            <div style={{
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              opacity: 0,
-              transform: 'translateX(-20px)',
-              animation: 'slideInRight 400ms ease-out 300ms forwards',
             }}>
               <span style={{ 
                 backgroundColor: 'rgba(255, 255, 255, 0.2)', 
@@ -267,21 +263,16 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
                 borderRadius: '4px',
                 fontSize: '0.9rem',
                 opacity: 0.8,
-                transition: 'opacity 250ms ease, transform 250ms ease, background-color 250ms ease',
               }}>
                 Music
               </span>
               <span>{sprite.songTitle}</span>
-            </p>
-            <p style={{ 
-              margin: 0, 
-              fontSize: '1.2rem',
+            </div>
+            
+            <div style={{
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              opacity: 0,
-              transform: 'translateX(-20px)',
-              animation: 'slideInRight 400ms ease-out 400ms forwards',
             }}>
               <span style={{ 
                 backgroundColor: 'rgba(255, 255, 255, 0.2)', 
@@ -289,23 +280,17 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
                 borderRadius: '4px',
                 fontSize: '0.9rem',
                 opacity: 0.8,
-                transition: 'opacity 250ms ease, transform 250ms ease, background-color 250ms ease',
               }}>
                 Animation
               </span>
               <span>{sprite.animationMethods}</span>
-            </p>
+            </div>
           </div>
 
           <style>{`
-            @keyframes fadeInDown {
-              from { opacity: 0; transform: translateY(-20px); }
+            @keyframes fadeInUp {
+              from { opacity: 0; transform: translateY(20px); }
               to { opacity: 1; transform: translateY(0); }
-            }
-            
-            @keyframes slideInRight {
-              from { opacity: 0; transform: translateX(-20px); }
-              to { opacity: 1; transform: translateX(0); }
             }
           `}</style>
         </div>

@@ -45,8 +45,15 @@ export const useInactivityTimer = (options: UseInactivityTimerOptions = {}) => {
 
     // Set a new timer
     timerRef.current = setTimeout(() => {
+      console.log('Inactivity timeout reached - triggering onInactive callback');
       setIsInactive(true);
-      optionsRef.current.onInactive?.();
+      // Make sure to call the latest callback from options
+      if (optionsRef.current.onInactive) {
+        console.log('Calling onInactive callback');
+        optionsRef.current.onInactive();
+      } else {
+        console.warn('No onInactive callback provided');
+      }
     }, optionsRef.current.timeout || 60000);
   }, [isInactive]);
 

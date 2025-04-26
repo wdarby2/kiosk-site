@@ -44,16 +44,26 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
   const [selectedSprite, setSelectedSprite] = useState<Sprite | null>(initialSprite);
   const [timeout, setTimeout] = useState<number>(inactivityTimeout);
 
-  // Use the inactivity timer hook with stabilized callback
+  // Explicitly create a memoized callback for inactivity
   const handleInactivity = useCallback(() => {
     console.log('Inactive: Returning to home page');
+    // Force navigation back to home
     setCurrentPage(Page.HOME);
     setSelectedSprite(null);
   }, []);
 
+  // Set up the inactivity timer with our callback
   const [isInactive, resetInactivityTimer] = useInactivityTimer({
-    timeout,
-    onInactive: handleInactivity,
+    timeout: timeout,
+    onInactive: () => {
+      // Debug logging
+      console.log('INACTIVE: Setting page to HOME');
+      
+      // Direct state updates to guarantee execution
+      setCurrentPage(Page.HOME);
+      setSelectedSprite(null);
+    },
+    onActive: () => console.log('User active again'),
   });
 
   // Navigation function

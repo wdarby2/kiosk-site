@@ -8,7 +8,7 @@ interface InactivityMonitorProps {
 
 const InactivityMonitor: React.FC<InactivityMonitorProps> = ({
   showNotification = true,
-  warningSeconds = 10, // Show warning 10 seconds before timeout
+  warningSeconds = 5, // Show warning 5 seconds before timeout (shortened for testing)
 }) => {
   const { isInactive, inactivityTimeout, resetInactivityTimer } = useNavigation();
   const [showWarning, setShowWarning] = useState(false);
@@ -19,6 +19,8 @@ const InactivityMonitor: React.FC<InactivityMonitorProps> = ({
 
   // Set up the warning timer when the component mounts or inactivity status changes
   useEffect(() => {
+    console.log('InactivityMonitor: Setting up warning timer');
+    
     // Clear any existing timers
     if (warningTimerRef.current) {
       clearTimeout(warningTimerRef.current);
@@ -30,29 +32,37 @@ const InactivityMonitor: React.FC<InactivityMonitorProps> = ({
       countdownTimerRef.current = null;
     }
     
-    // Only set the timer if we're not already inactive
-    if (!isInactive && showNotification && inactivityTimeout > (warningSeconds * 1000)) {
+    // Always hide warning when resetting
+    setShowWarning(false);
+    
+    // Set new warning timer
+    if (showNotification && inactivityTimeout > (warningSeconds * 1000)) {
+      console.log(`Setting warning to show in ${inactivityTimeout - (warningSeconds * 1000)}ms`);
+      
       // Set timer to show the warning shortly before timeout
       warningTimerRef.current = setTimeout(() => {
+        console.log('Showing inactivity warning now');
         setShowWarning(true);
         setCountdown(warningSeconds);
         
         // Start countdown
         countdownTimerRef.current = setInterval(() => {
           setCountdown(prev => {
-            if (prev <= 1) {
+            const newValue = prev - 1;
+            console.log(`Countdown: ${newValue}`);
+            
+            if (newValue <= 0) {
+              console.log('Countdown reached zero');
               if (countdownTimerRef.current) {
                 clearInterval(countdownTimerRef.current);
                 countdownTimerRef.current = null;
               }
               return 0;
             }
-            return prev - 1;
+            return newValue;
           });
         }, 1000);
       }, inactivityTimeout - (warningSeconds * 1000));
-    } else {
-      setShowWarning(false);
     }
     
     // Clean up on unmount
@@ -73,8 +83,8 @@ const InactivityMonitor: React.FC<InactivityMonitorProps> = ({
     }
   }, [isInactive]);
   
-  // No need to render if inactive or notifications disabled
-  if (isInactive || !showNotification || !showWarning) {
+  // Only render if the warning should be shown
+  if (!showWarning) {
     return null;
   }
   

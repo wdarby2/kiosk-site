@@ -1,41 +1,29 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import VideoFullscreen from '../components/VideoFullscreen';
-import { useNavigation, Page } from '../context/NavigationContext';
+import { Sprite } from '../types';
 
-const SpritePage: React.FC = () => {
-  const { selectedSprite, navigate, resetInactivityTimer } = useNavigation();
+interface SpritePageProps {
+  sprite: Sprite;
+  onClose: () => void;
+}
 
-  // Reset inactivity timer when the component mounts
-  useEffect(() => {
-    resetInactivityTimer();
-  }, [resetInactivityTimer]);
-
-  // If no sprite is selected, redirect to home
-  useEffect(() => {
-    if (!selectedSprite) {
-      navigate(Page.HOME);
-    }
-  }, [selectedSprite, navigate]);
-
-  // Early return if no sprite is selected
-  if (!selectedSprite) {
+const SpritePage: React.FC<SpritePageProps> = ({ sprite, onClose }) => {
+  if (!sprite) {
     return null;
   }
 
-  // Handle close event
-  const handleClose = () => {
-    navigate(Page.HOME);
-  };
-
   return (
-    <div className="sprite-page" style={{
-      width: '100%',
-      height: '100vh',
-      backgroundColor: '#000',
-    }}>
+    <div 
+      className="sprite-page" 
+      style={{
+        width: '100%',
+        height: '100vh',
+        backgroundColor: '#000',
+      }}
+    >
       <VideoFullscreen
-        sprite={selectedSprite}
-        onClose={handleClose}
+        sprite={sprite}
+        onClose={onClose}
         autoPlay={true}
       />
     </div>

@@ -1,29 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import VideoThumbnail from '../components/VideoThumbnail';
-import { useNavigation, Page } from '../context/NavigationContext';
 import { Sprite } from '../types';
-// Direct import for debugging
 import spritesData from '../assets/metadata/sprites.json';
 
-const Home: React.FC = () => {
-  const { navigate, resetInactivityTimer } = useNavigation();
+interface HomeProps {
+  onSpriteSelect: (sprite: Sprite) => void;
+}
+
+const Home: React.FC<HomeProps> = ({ onSpriteSelect }) => {
   const [sprites, setSprites] = useState<Sprite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load sprite data on component mount - simplified direct approach
+  // Load sprite data on component mount
   useEffect(() => {
-    console.log('Direct loading of sprites');
+    console.log('Loading sprite data for Home page');
     setLoading(true);
     
     try {
-      // Simple direct use of imported data
       if (spritesData && Array.isArray(spritesData.sprites)) {
-        console.log('Setting sprites from direct import, length:', spritesData.sprites.length);
+        console.log(`Found ${spritesData.sprites.length} sprites`);
         setSprites(spritesData.sprites);
         setLoading(false);
       } else {
-        console.error('Invalid sprites data format in direct import');
         setError('Failed to parse sprite data.');
         setLoading(false);
       }
@@ -34,14 +33,9 @@ const Home: React.FC = () => {
     }
   }, []);
 
-  // Separate effect for resetting inactivity timer
-  useEffect(() => {
-    resetInactivityTimer();
-  }, [resetInactivityTimer]);
-
   // Handle sprite selection
   const handleSpriteClick = (sprite: Sprite) => {
-    navigate(Page.SPRITE, sprite);
+    onSpriteSelect(sprite);
   };
 
   if (loading) {
@@ -115,9 +109,6 @@ const Home: React.FC = () => {
       </div>
     );
   }
-
-  // Add a console log to check sprites data before rendering
-  console.log('Rendering Home with sprites:', sprites.length);
 
   return (
     <div className="home-page" style={{

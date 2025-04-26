@@ -1,12 +1,17 @@
 import React from 'react';
-import { useNavigation, Page } from '../../context/NavigationContext';
 
 interface NavigationProps {
+  currentPage: string;
+  onHomeClick: () => void;
   className?: string;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
-  const { currentPage, goHome, isInactive } = useNavigation();
+const Navigation: React.FC<NavigationProps> = ({ 
+  currentPage, 
+  onHomeClick, 
+  className = '' 
+}) => {
+  const isHomePage = currentPage === 'home';
   
   return (
     <nav className={`navigation ${className}`} style={{
@@ -25,7 +30,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
     }}>
       <div className="navigation-left">
         <button
-          onClick={goHome}
+          onClick={onHomeClick}
           style={{
             background: 'none',
             border: 'none',
@@ -35,8 +40,8 @@ const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem',
-            opacity: currentPage === Page.HOME ? 0.6 : 1,
-            pointerEvents: currentPage === Page.HOME ? 'none' : 'auto',
+            opacity: isHomePage ? 0.6 : 1,
+            pointerEvents: isHomePage ? 'none' : 'auto',
           }}
         >
           <span style={{
@@ -58,16 +63,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
         alignItems: 'center',
         gap: '1rem',
       }}>
-        {isInactive && (
-          <span style={{
-            fontSize: '0.8rem',
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            padding: '0.25rem 0.5rem',
-            borderRadius: '4px',
-          }}>
-            Inactive
-          </span>
-        )}
+        {/* This space intentionally left blank for symmetry */}
       </div>
     </nav>
   );

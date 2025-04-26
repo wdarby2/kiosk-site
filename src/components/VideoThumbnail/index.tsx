@@ -71,24 +71,20 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{
-        width: '100%',
-        height: '100%',
-        aspectRatio: '16/9',
+        width: '100%', // Take full container width
+        paddingTop: '100%', // Create square aspect ratio
         backgroundColor: '#222',
-        borderRadius: '12px', // Slightly more rounded for gallery style
+        borderRadius: '6px', // Slightly rounded corners
         overflow: 'hidden',
         position: 'relative',
         cursor: onClick ? 'pointer' : 'default',
         border: 'none',
         boxShadow: isHovered ? 
-          '0 8px 16px rgba(0,0,0,0.15)' : 
-          '0 4px 8px rgba(0,0,0,0.1)',
-        transform: isHovered ? 'scale(1.03)' : 'scale(1)',
-        transition: `
-          transform ${TIMING.standard}ms ${EASING.emphasized},
-          box-shadow ${TIMING.standard}ms ${EASING.easeOut}
-        `,
-        willChange: 'transform, box-shadow',
+          '0 4px 8px rgba(0,0,0,0.15)' : 
+          '0 2px 4px rgba(0,0,0,0.1)',
+        transform: isHovered ? 'scale(1.03)' : 'scale(1)', // Slightly larger hover effect
+        transition: `transform ${TIMING.standard}ms ${EASING.emphasized}`,
+        willChange: 'transform',
       }}
     >
       {/* Video element */}
@@ -98,10 +94,13 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         playsInline
         loop
         style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          objectPosition: 'center',
+          objectPosition: 'center center', // Explicitly center the video content
           borderRadius: '12px', // Match parent container's rounded corners
         }}
       />
@@ -120,6 +119,7 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
             background: 'radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%)',
             pointerEvents: 'none',
             animation: 'fadeIn 300ms ease forwards',
+            zIndex: 1, // Ensure overlay is above video
           }}
         />
       )}
@@ -136,6 +136,7 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           backgroundColor: 'rgba(0,0,0,0.5)',
+          zIndex: 2, // Ensure loading indicator is above all
         }}>
           <div style={{
             width: '40px',
@@ -164,6 +165,7 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           justifyContent: 'center',
           opacity: videoState.isPlaying ? 0 : 0.8,
           transition: `opacity ${TIMING.standard}ms ${EASING.easeOut}`,
+          zIndex: 2, // Ensure play indicator is above video
         }}>
           <div style={{
             width: 0,

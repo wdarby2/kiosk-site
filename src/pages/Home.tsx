@@ -112,19 +112,24 @@ const Home: React.FC<HomeProps> = ({ onSpriteSelect }) => {
 
   return (
     <div className="home-page" style={{
-      width: '100vw',
+      width: '100%',
       height: '100vh',
-      overflow: 'hidden', // Prevent scrolling
       display: 'flex',
       flexDirection: 'column',
-      paddingTop: '60px', // Account for the fixed navigation
+      paddingTop: '60px', // Space for navigation
+      boxSizing: 'border-box',
+      overflow: 'hidden', // Prevent scrolling
+      alignItems: 'center', // Center content horizontally
     }}>
       <h1 style={{ 
-        textAlign: 'center', 
-        margin: '1vh 0',
-        fontSize: 'clamp(1.5rem, 2vw, 2.5rem)', // Responsive font size
+        textAlign: 'center',  // Center-align the title
+        margin: '0 0 5px',  // Minimal margin
+        width: '100%',
+        fontSize: 'clamp(1rem, 1.2vw, 1.5rem)', // Small font size
+        lineHeight: 1.1, // Super tight line height
+        fontWeight: 'normal', // Reduce the visual weight
       }}>
-        Motion Study Sprites Gallery
+        Motion Study Sprites
       </h1>
       
       {sprites.length === 0 ? (

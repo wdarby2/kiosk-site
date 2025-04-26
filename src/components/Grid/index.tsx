@@ -37,34 +37,41 @@ const Grid: React.FC<GridProps> = ({
   // Using viewport units to ensure the grid fits perfectly on a 27" display
   return (
     <div className={`grid-container ${isLoaded ? 'loaded' : ''}`} style={{
-      width: '100vw',
-      height: '90vh', // Leave room for header and potential margins
-      padding: '2vh 3vw', // Consistent padding on all sides
+      width: '100%', // Use 100% to respect parent container size
+      height: 'calc(100vh - 80px)', // Ensure it fits below header
+      padding: '0', // No padding, let grid component handle spacing
       boxSizing: 'border-box',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
     }}>
       <div className="sprites-grid" style={{
         display: 'grid',
-        gridTemplateColumns: `repeat(${columnCount}, 1fr)`, // Configurable columns
-        gridTemplateRows: `repeat(${rowCount}, 1fr)`,       // Configurable rows
-        gap: '2vh 2vw',  // Vertical and horizontal gap as percentage of viewport
-        width: '100%',
-        height: '100%',
+        gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`, // Responsive columns
+        gridTemplateRows: `repeat(${rowCount}, minmax(0, 1fr))`, // Responsive rows
+        justifyContent: 'center', // Center the grid horizontally
+        gap: '1.5vh 1.5vw',  // Responsive gaps
+        width: '95%', // Take most of container width
+        height: '85vh', // Fixed height that should fit on 27" display
+        margin: '0 auto', // Center the grid
       }}>
         {sprites.map((sprite, index) => (
           <div 
             key={sprite.id} 
             style={{
               width: '100%',
-              height: '100%',
+              height: '100%', // Fill the grid cell
               display: 'flex',
-              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
               // Use CSS variables for staggered animations
               ['--item-index' as any]: index,
               opacity: 0, // Start invisible for entrance animation
               animation: isLoaded ? 
                 `scaleIn 400ms ${EASING.easeOut} forwards` : 'none',
               animationDelay: isLoaded ? 
-                `${100 + (index * 50)}ms` : '0ms', // Staggered delay
+                `${100 + (index * 30)}ms` : '0ms', // Faster staggered delay
               transform: 'scale(0.95)', // Starting scale for entrance animation
               willChange: 'opacity, transform',
             }} 

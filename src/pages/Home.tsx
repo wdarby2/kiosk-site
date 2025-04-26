@@ -155,7 +155,7 @@ const Home: React.FC = () => {
                 key={sprite.id}
                 sprite={sprite}
                 onClick={handleSpriteClick}
-                previewMode={false} // Changed to false to avoid autoplay issues
+                previewMode={true} // Enable autoplay in grid
               />
               <div style={{ padding: '0.75rem', textAlign: 'center' }}>
                 <h3 style={{ margin: 0, fontSize: '1rem' }}>{sprite.title}</h3>

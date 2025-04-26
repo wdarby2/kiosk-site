@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import useVideoPlayback from '../../hooks/useVideoPlayback';
 import { Sprite } from '../../types';
+import { getVideoPath } from '../../utils';
 
 interface VideoThumbnailProps {
   sprite: Sprite;
@@ -14,15 +15,45 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
   sprite,
   onClick,
   isActive = false,
-  previewMode = false,
+  previewMode = true, // Default to true for grid view
   className = '',
 }) => {
-  // Simplified version without video loading initially
-  console.log(`Rendering VideoThumbnail for sprite:`, sprite.id, sprite.title);
-  
-  // Handle click
+  // Use our custom hook for video playback
+  const [videoRef, videoState, videoControls] = useVideoPlayback(
+    sprite.filename,
+    {
+      // Only autoplay in preview mode and if not previously loaded
+      autoPlay: previewMode,
+      loop: true,
+      muted: true, // Always muted in grid view
+      playsInline: true,
+      controls: false,
+      forceProtocolCheck: true,
+    }
+  );
+
+  // Handle mouse interactions for preview mode
+  const handleMouseEnter = () => {
+    if (previewMode && !videoState.isPlaying) {
+      videoControls.play();
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (previewMode && videoState.isPlaying && !isActive) {
+      videoControls.pause();
+    }
+  };
+
+  // Play video when in preview mode or when active
+  useEffect(() => {
+    if ((previewMode || isActive) && videoState.isLoaded && !videoState.isPlaying) {
+      videoControls.play();
+    }
+  }, [previewMode, isActive, videoState.isLoaded, videoState.isPlaying, videoControls]);
+
+  // Handle clicking on the thumbnail
   const handleClick = () => {
-    console.log('Thumbnail clicked:', sprite.title);
     if (onClick) {
       onClick(sprite);
     }
@@ -32,10 +63,12 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
     <div 
       className={`video-thumbnail ${isActive ? 'active' : ''} ${className}`}
       onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       style={{
         width: '100%',
         aspectRatio: '16/9',
-        backgroundColor: '#333',
+        backgroundColor: '#222',
         borderRadius: '8px',
         overflow: 'hidden',
         position: 'relative',
@@ -43,34 +76,18 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         border: isActive ? '3px solid #4a90e2' : '3px solid transparent',
       }}
     >
-      {/* Placeholder for video */}
-      <div style={{
-        width: '100%',
-        height: '100%',
-        backgroundColor: '#222',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-        <div style={{
-          width: '60px',
-          height: '60px',
-          borderRadius: '50%',
-          backgroundColor: 'rgba(255,255,255,0.2)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          <div style={{
-            width: 0,
-            height: 0,
-            borderTop: '12px solid transparent',
-            borderBottom: '12px solid transparent',
-            borderLeft: '20px solid #fff',
-            marginLeft: '5px',
-          }}></div>
-        </div>
-      </div>
+      {/* Video element */}
+      <video
+        ref={videoRef}
+        muted
+        playsInline
+        loop
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+        }}
+      />
 
       {/* Overlay with sprite info */}
       <div style={{
@@ -87,7 +104,67 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 'bold' }}>{sprite.title}</h3>
         <p style={{ margin: '0.25rem 0 0', fontSize: '0.8rem', opacity: 0.8 }}>{sprite.genre}</p>
       </div>
+
+      {/* Loading indicator */}
+      {!videoState.isLoaded && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'rgba(0,0,0,0.5)',
+        }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid rgba(255,255,255,0.3)',
+            borderRadius: '50%',
+            borderTop: '4px solid #fff',
+            animation: 'spin 1s linear infinite',
+          }}></div>
+
+          <style>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      )}
+
+      {/* Play indicator */}
+      {isActive && (
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '64px',
+          height: '64px',
+          backgroundColor: 'rgba(255,255,255,0.2)',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: videoState.isPlaying ? 0 : 0.8,
+          transition: 'opacity 0.3s ease',
+        }}>
+          <div style={{
+            width: 0,
+            height: 0,
+            borderTop: '12px solid transparent',
+            borderBottom: '12px solid transparent',
+            borderLeft: '20px solid #fff',
+            marginLeft: '5px',
+          }}></div>
+        </div>
+      )}
     </div>
   );
 };
+
 export default VideoThumbnail;

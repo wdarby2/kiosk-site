@@ -67,13 +67,15 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       onMouseLeave={handleMouseLeave}
       style={{
         width: '100%',
+        height: '100%',
         aspectRatio: '16/9',
         backgroundColor: '#222',
-        borderRadius: '8px',
+        borderRadius: '12px', // Slightly more rounded for gallery style
         overflow: 'hidden',
         position: 'relative',
         cursor: onClick ? 'pointer' : 'default',
         border: isActive ? '3px solid #4a90e2' : '3px solid transparent',
+        boxShadow: '0 4px 8px rgba(0,0,0,0.1)', // Subtle shadow for depth
       }}
     >
       {/* Video element */}
@@ -86,6 +88,8 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           width: '100%',
           height: '100%',
           objectFit: 'cover',
+          objectPosition: 'center',
+          borderRadius: '8px', // Match parent container's rounded corners
         }}
       />
 

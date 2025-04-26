@@ -16,10 +16,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
   padding: 0;
-  background-color: #f8f9fa;
-  color: #212529;
+  background-color: #121212; /* Dark background for immersive gallery feel */
+  color: #f5f5f5;
   line-height: 1.5;
-  overflow-x: hidden;
+  overflow: hidden; /* Prevent any scrolling on kiosk display */
+  height: 100vh;
+  width: 100vw;
+  /* Prevent text selection in kiosk mode */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -67,6 +72,53 @@ button {
   border-width: 0;
 }
 
+/* Grid Layout Styles */
+.grid-container {
+  box-sizing: border-box;
+  opacity: 0; /* Start hidden */
+  transition: opacity 0.5s ease-out;
+}
+
+.grid-container.loaded {
+  opacity: 1; /* Show when loaded */
+}
+
+.sprites-grid {
+  /* GPU acceleration for smooth animations */
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.grid-item {
+  will-change: transform;
+  transform: scale(1);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  opacity: 0;
+  animation: scaleIn 0.4s ease-out forwards;
+  /* Stagger children animations */
+  animation-delay: calc(var(--item-index, 0) * 0.05s);
+}
+
+.grid-container.loaded .grid-item {
+  opacity: 1;
+}
+
+.grid-item:hover {
+  transform: scale(1.05);
+  z-index: 10; /* Ensure hovered items appear above others */
+}
+
+/* Video thumbnail enhancements for grid */
+.grid-thumbnail {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.25s ease, 
+              transform 0.25s ease;
+}
+
+.grid-thumbnail:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
 /* Animation utilities */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -92,4 +144,9 @@ button {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0.8; }
+  to { transform: scale(1); opacity: 1; }
 }

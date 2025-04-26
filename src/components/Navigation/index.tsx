@@ -19,14 +19,16 @@ const Navigation: React.FC<NavigationProps> = ({
       top: 0,
       left: 0,
       width: '100%',
-      padding: '1rem',
+      height: '60px', // Fixed height for consistent layout
+      padding: '0 1rem',
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
       color: '#fff',
       zIndex: 900,
       backdropFilter: 'blur(5px)',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
     }}>
       <div className="navigation-left">
         <button

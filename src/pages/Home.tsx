@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import VideoThumbnail from '../components/VideoThumbnail';
+import Grid from '../components/Grid';
 import { Sprite } from '../types';
 import spritesData from '../assets/metadata/sprites.json';
 
@@ -112,13 +112,17 @@ const Home: React.FC<HomeProps> = ({ onSpriteSelect }) => {
 
   return (
     <div className="home-page" style={{
-      padding: '1rem',
-      paddingTop: 'calc(1rem + 60px)', // Account for the fixed navigation
+      width: '100vw',
+      height: '100vh',
+      overflow: 'hidden', // Prevent scrolling
+      display: 'flex',
+      flexDirection: 'column',
+      paddingTop: '60px', // Account for the fixed navigation
     }}>
       <h1 style={{ 
         textAlign: 'center', 
-        margin: '1rem 0 2rem',
-        fontSize: '2rem',
+        margin: '1vh 0',
+        fontSize: 'clamp(1.5rem, 2vw, 2.5rem)', // Responsive font size
       }}>
         Motion Study Sprites Gallery
       </h1>
@@ -128,32 +132,10 @@ const Home: React.FC<HomeProps> = ({ onSpriteSelect }) => {
           <p>No sprites found. Please check the data source.</p>
         </div>
       ) : (
-        <div className="sprite-grid" style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '1.5rem',
-          maxWidth: '1400px',
-          margin: '0 auto',
-        }}>
-          {sprites.map((sprite) => (
-            <div key={sprite.id} style={{ 
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              overflow: 'hidden',
-              backgroundColor: '#f8f9fa',
-            }}>
-              <VideoThumbnail
-                key={sprite.id}
-                sprite={sprite}
-                onClick={handleSpriteClick}
-                previewMode={true} // Enable autoplay in grid
-              />
-              <div style={{ padding: '0.75rem', textAlign: 'center' }}>
-                <h3 style={{ margin: 0, fontSize: '1rem' }}>{sprite.title}</h3>
-              </div>
-            </div>
-          ))}
-        </div>
+        <Grid 
+          sprites={sprites}
+          onSpriteSelect={handleSpriteClick}
+        />
       )}
     </div>
   );

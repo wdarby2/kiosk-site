@@ -18,9 +18,8 @@ const App: React.FC = () => {
   const [selectedSprite, setSelectedSprite] = useState<Sprite | null>(null);
 
   // Inactivity timer for the sprite page
-  const [showWarning, setShowWarning] = useState(false);
-  const [countdown, setCountdown] = useState(3);
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Keep refs for compatibility, but we won't use them to show UI
   const warningTimerRef = useRef<NodeJS.Timeout | null>(null);
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -38,7 +37,6 @@ const App: React.FC = () => {
       clearInterval(countdownRef.current);
       countdownRef.current = null;
     }
-    setShowWarning(false);
   };
 
   // Start the inactivity timer
@@ -51,34 +49,15 @@ const App: React.FC = () => {
 
     console.log('App: Starting inactivity timer');
 
-    // Set warning timer (7 seconds into the 10-second inactivity period)
-    warningTimerRef.current = setTimeout(() => {
-      console.log('App: Warning timer triggered');
-      setShowWarning(true);
-      setCountdown(3); // 3 seconds warning
-
-      // Countdown timer
-      countdownRef.current = setInterval(() => {
-        setCountdown(prev => {
-          const newVal = prev - 1;
-          console.log(`App: Countdown ${newVal}`);
-          if (newVal <= 0) {
-            if (countdownRef.current) {
-              clearInterval(countdownRef.current);
-              countdownRef.current = null;
-            }
-            return 0;
-          }
-          return newVal;
-        });
-      }, 1000);
-    }, 7000);
-
     // Main inactivity timer (10 seconds)
     inactivityTimerRef.current = setTimeout(() => {
       console.log('App: Inactivity timeout reached, navigating to home');
       goHome();
     }, 10000);
+    
+    // We keep these references but don't show the UI
+    warningTimerRef.current = null;
+    countdownRef.current = null;
   };
 
   // Reset the inactivity timer
@@ -239,164 +218,7 @@ const App: React.FC = () => {
 
         {renderPage()}
 
-        {/* Inactivity Warning */}
-        {showWarning && (
-          <div
-            className="inactivity-warning"
-            style={{
-              position: 'fixed',
-              bottom: '20px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              backgroundColor: 'rgba(50, 50, 50, 0.9)',
-              color: 'white',
-              padding: '20px 30px',
-              borderRadius: '10px',
-              boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
-              zIndex: 2000,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '15px',
-              animation: 'fadeIn 0.4s forwards',
-              backdropFilter: 'blur(5px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-            }}
-            onClick={resetInactivityTimer}
-          >
-            <div
-              className="timer-icon"
-              style={{
-                width: '50px',
-                height: '50px',
-                borderRadius: '50%',
-                border: '3px solid #4a90e2',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '5px',
-                position: 'relative',
-                animation: 'pulse 1.5s infinite ease-in-out',
-              }}
-            >
-              <div
-                className="timer-circle"
-                style={{
-                  position: 'absolute',
-                  top: '-3px',
-                  left: '-3px',
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '50%',
-                  border: '3px solid transparent',
-                  borderTopColor: 'white',
-                  animation: `countdown ${countdown}s linear forwards`,
-                  transformOrigin: 'center center',
-                }}
-              ></div>
-              <span
-                style={{
-                  fontSize: '1.5rem',
-                  fontWeight: 'bold',
-                  animation: 'countScale 1s infinite alternate ease-in-out',
-                }}
-              >
-                {countdown}
-              </span>
-            </div>
-
-            <div style={{ textAlign: 'center' }}>
-              <p
-                style={{
-                  marginBottom: '10px',
-                  fontSize: '1.1rem',
-                  fontWeight: 'bold',
-                  animation: 'fadeSlideUp 0.5s forwards 0.2s',
-                  opacity: 0,
-                  transform: 'translateY(10px)',
-                }}
-              >
-                Returning to home screen soon
-              </p>
-              <p
-                style={{
-                  fontSize: '0.9rem',
-                  opacity: 0,
-                  animation: 'fadeSlideUp 0.5s forwards 0.4s',
-                  transform: 'translateY(10px)',
-                }}
-              >
-                Touch screen to continue viewing
-              </p>
-            </div>
-
-            <button
-              onClick={resetInactivityTimer}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#4a90e2',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '1rem',
-                fontWeight: 'bold',
-                transform: 'scale(0.95)',
-                opacity: 0,
-                animation: 'buttonAppear 0.5s forwards 0.6s',
-                transition: 'transform 0.2s ease, background-color 0.2s ease',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
-              }}
-              onMouseOver={e => {
-                e.currentTarget.style.transform = 'scale(1.05)';
-                e.currentTarget.style.backgroundColor = '#5da0ec';
-              }}
-              onMouseOut={e => {
-                e.currentTarget.style.transform = 'scale(1)';
-                e.currentTarget.style.backgroundColor = '#4a90e2';
-              }}
-            >
-              Continue Viewing
-            </button>
-
-            <style>{`
-              @keyframes fadeIn {
-                from { opacity: 0; transform: translate(-50%, 20px); }
-                to { opacity: 1; transform: translate(-50%, 0); }
-              }
-              
-              @keyframes pulse {
-                0% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.4); }
-                70% { box-shadow: 0 0 0 10px rgba(74, 144, 226, 0); }
-                100% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0); }
-              }
-              
-              @keyframes countdown {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
-              }
-              
-              @keyframes countScale {
-                from { transform: scale(1); }
-                to { transform: scale(1.1); }
-              }
-              
-              @keyframes fadeSlideUp {
-                from { opacity: 0; transform: translateY(10px); }
-                to { opacity: 1; transform: translateY(0); }
-              }
-              
-              @keyframes buttonAppear {
-                from { opacity: 0; transform: scale(0.9); }
-                to { opacity: 1; transform: scale(1); }
-              }
-
-              .inactivity-warning:hover .timer-circle {
-                animation-play-state: paused;
-              }
-            `}</style>
-          </div>
-        )}
+        {/* Inactivity Warning removed - auto-close behavior still works silently */}
       </div>
     </ErrorBoundary>
   );

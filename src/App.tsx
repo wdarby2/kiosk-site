@@ -16,14 +16,14 @@ const App: React.FC = () => {
   // Application state
   const [currentPage, setCurrentPage] = useState<Page>(Page.HOME);
   const [selectedSprite, setSelectedSprite] = useState<Sprite | null>(null);
-  
+
   // Inactivity timer for the sprite page
   const [showWarning, setShowWarning] = useState(false);
   const [countdown, setCountdown] = useState(3);
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
   const warningTimerRef = useRef<NodeJS.Timeout | null>(null);
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   // Clear all timers
   const clearAllTimers = () => {
     if (inactivityTimerRef.current) {
@@ -40,23 +40,23 @@ const App: React.FC = () => {
     }
     setShowWarning(false);
   };
-  
+
   // Start the inactivity timer
   const startInactivityTimer = () => {
     // Clear any existing timers first
     clearAllTimers();
-    
+
     // Only start timer on sprite page
     if (currentPage !== Page.SPRITE) return;
-    
+
     console.log('App: Starting inactivity timer');
-    
+
     // Set warning timer (7 seconds into the 10-second inactivity period)
     warningTimerRef.current = setTimeout(() => {
       console.log('App: Warning timer triggered');
       setShowWarning(true);
       setCountdown(3); // 3 seconds warning
-      
+
       // Countdown timer
       countdownRef.current = setInterval(() => {
         setCountdown(prev => {
@@ -73,14 +73,14 @@ const App: React.FC = () => {
         });
       }, 1000);
     }, 7000);
-    
+
     // Main inactivity timer (10 seconds)
     inactivityTimerRef.current = setTimeout(() => {
       console.log('App: Inactivity timeout reached, navigating to home');
       goHome();
     }, 10000);
   };
-  
+
   // Reset the inactivity timer
   const resetInactivityTimer = () => {
     if (currentPage === Page.SPRITE) {
@@ -89,7 +89,7 @@ const App: React.FC = () => {
       startInactivityTimer();
     }
   };
-  
+
   // Effect to start/stop timer when page changes
   useEffect(() => {
     if (currentPage === Page.SPRITE) {
@@ -97,11 +97,11 @@ const App: React.FC = () => {
     } else {
       clearAllTimers();
     }
-    
+
     // Cleanup on unmount
     return clearAllTimers;
   }, [currentPage]);
-  
+
   // Navigation functions
   const navigate = (page: Page, sprite?: Sprite) => {
     console.log(`App: Navigating to ${page}`, sprite);
@@ -110,30 +110,30 @@ const App: React.FC = () => {
       setSelectedSprite(sprite);
     }
   };
-  
+
   const goHome = () => {
     console.log('App: Navigating to HOME');
     clearAllTimers();
     setCurrentPage(Page.HOME);
     setSelectedSprite(null);
   };
-  
+
   // Handle user interaction (to reset timer)
   const handleUserInteraction = () => {
     if (currentPage === Page.SPRITE) {
       resetInactivityTimer();
     }
   };
-  
+
   // Track page transition states
   const [isExiting, setIsExiting] = useState(false);
   const [pendingPage, setPendingPage] = useState<{ page: Page; sprite?: Sprite } | null>(null);
-  
+
   // Handle page transitions
   const handlePageTransition = (page: Page, sprite?: Sprite) => {
     setIsExiting(true);
     setPendingPage({ page, sprite });
-    
+
     // Wait for exit animation to complete before changing page
     setTimeout(() => {
       if (page === Page.SPRITE && sprite) {
@@ -145,11 +145,11 @@ const App: React.FC = () => {
       setPendingPage(null);
     }, 400); // Match transition duration
   };
-  
+
   // Render the appropriate page based on current navigation state
   const renderPage = () => {
     const activePage = pendingPage ? pendingPage.page : currentPage;
-    
+
     // Apply transition classes
     const pageClasses = `
       page-container 
@@ -157,15 +157,13 @@ const App: React.FC = () => {
       ${pendingPage ? 'entering' : ''} 
       ${activePage === Page.HOME ? 'home-page' : 'sprite-page'}
     `;
-    
+
     switch (currentPage) {
       case Page.HOME:
         return (
           <div className={pageClasses}>
-            <Home 
-              onSpriteSelect={(sprite) => handlePageTransition(Page.SPRITE, sprite)} 
-            />
-            
+            <Home onSpriteSelect={sprite => handlePageTransition(Page.SPRITE, sprite)} />
+
             <style>{`
               .page-container {
                 position: relative;
@@ -198,12 +196,12 @@ const App: React.FC = () => {
       case Page.SPRITE:
         return selectedSprite ? (
           <div className={pageClasses}>
-            <SpritePage 
-              sprite={selectedSprite} 
+            <SpritePage
+              sprite={selectedSprite}
               onClose={() => handlePageTransition(Page.HOME)}
               onUserInteraction={handleUserInteraction}
             />
-            
+
             <style>{`
               .page-container {
                 position: relative;
@@ -228,25 +226,22 @@ const App: React.FC = () => {
       default:
         return (
           <div className={pageClasses}>
-            <Home onSpriteSelect={(sprite) => handlePageTransition(Page.SPRITE, sprite)} />
+            <Home onSpriteSelect={sprite => handlePageTransition(Page.SPRITE, sprite)} />
           </div>
         );
     }
   };
-  
+
   return (
     <ErrorBoundary>
       <div className="app">
-        <Navigation 
-          currentPage={currentPage} 
-          onHomeClick={goHome} 
-        />
-        
+        <Navigation currentPage={currentPage} onHomeClick={goHome} />
+
         {renderPage()}
-        
+
         {/* Inactivity Warning */}
         {showWarning && (
-          <div 
+          <div
             className="inactivity-warning"
             style={{
               position: 'fixed',
@@ -269,61 +264,73 @@ const App: React.FC = () => {
             }}
             onClick={resetInactivityTimer}
           >
-            <div className="timer-icon" style={{
-              width: '50px',
-              height: '50px',
-              borderRadius: '50%',
-              border: '3px solid #4a90e2',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '5px',
-              position: 'relative',
-              animation: 'pulse 1.5s infinite ease-in-out',
-            }}>
-              <div className="timer-circle" style={{
-                position: 'absolute',
-                top: '-3px',
-                left: '-3px',
+            <div
+              className="timer-icon"
+              style={{
                 width: '50px',
                 height: '50px',
                 borderRadius: '50%',
-                border: '3px solid transparent',
-                borderTopColor: 'white',
-                animation: `countdown ${countdown}s linear forwards`,
-                transformOrigin: 'center center',
-              }}></div>
-              <span style={{ 
-                fontSize: '1.5rem', 
-                fontWeight: 'bold',
-                animation: 'countScale 1s infinite alternate ease-in-out',
-              }}>
+                border: '3px solid #4a90e2',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '5px',
+                position: 'relative',
+                animation: 'pulse 1.5s infinite ease-in-out',
+              }}
+            >
+              <div
+                className="timer-circle"
+                style={{
+                  position: 'absolute',
+                  top: '-3px',
+                  left: '-3px',
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '50%',
+                  border: '3px solid transparent',
+                  borderTopColor: 'white',
+                  animation: `countdown ${countdown}s linear forwards`,
+                  transformOrigin: 'center center',
+                }}
+              ></div>
+              <span
+                style={{
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold',
+                  animation: 'countScale 1s infinite alternate ease-in-out',
+                }}
+              >
                 {countdown}
               </span>
             </div>
-            
+
             <div style={{ textAlign: 'center' }}>
-              <p style={{ 
-                marginBottom: '10px', 
-                fontSize: '1.1rem',
-                fontWeight: 'bold',
-                animation: 'fadeSlideUp 0.5s forwards 0.2s',
-                opacity: 0,
-                transform: 'translateY(10px)',
-              }}>
+              <p
+                style={{
+                  marginBottom: '10px',
+                  fontSize: '1.1rem',
+                  fontWeight: 'bold',
+                  animation: 'fadeSlideUp 0.5s forwards 0.2s',
+                  opacity: 0,
+                  transform: 'translateY(10px)',
+                }}
+              >
                 Returning to home screen soon
               </p>
-              <p style={{ 
-                fontSize: '0.9rem', 
-                opacity: 0,
-                animation: 'fadeSlideUp 0.5s forwards 0.4s',
-                transform: 'translateY(10px)',
-              }}>
+              <p
+                style={{
+                  fontSize: '0.9rem',
+                  opacity: 0,
+                  animation: 'fadeSlideUp 0.5s forwards 0.4s',
+                  transform: 'translateY(10px)',
+                }}
+              >
                 Touch screen to continue viewing
               </p>
             </div>
-            
-            <button 
+
+            <button
               onClick={resetInactivityTimer}
               style={{
                 padding: '10px 20px',
@@ -340,11 +347,11 @@ const App: React.FC = () => {
                 transition: 'transform 0.2s ease, background-color 0.2s ease',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
               }}
-              onMouseOver={(e) => {
+              onMouseOver={e => {
                 e.currentTarget.style.transform = 'scale(1.05)';
                 e.currentTarget.style.backgroundColor = '#5da0ec';
               }}
-              onMouseOut={(e) => {
+              onMouseOut={e => {
                 e.currentTarget.style.transform = 'scale(1)';
                 e.currentTarget.style.backgroundColor = '#4a90e2';
               }}

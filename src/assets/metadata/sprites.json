@@ -15,6 +15,150 @@
       "genre": "Ambient",
       "songTitle": "Floating Particles",
       "animationMethods": "Blender, After Effects"
+    },
+    {
+      "id": 3,
+      "filename": "sprite3.mp4",
+      "title": "Motion Study 3",
+      "genre": "Experimental",
+      "songTitle": "Fractal Dreams",
+      "animationMethods": "Cinema 4D, Houdini"
+    },
+    {
+      "id": 4,
+      "filename": "sprite4.mp4",
+      "title": "Motion Study 4",
+      "genre": "Techno",
+      "songTitle": "Neon Pulse",
+      "animationMethods": "Blender, After Effects"
+    },
+    {
+      "id": 5,
+      "filename": "sprite5.mp4",
+      "title": "Motion Study 5",
+      "genre": "House",
+      "songTitle": "Rhythm of the City",
+      "animationMethods": "Cinema 4D, After Effects"
+    },
+    {
+      "id": 6,
+      "filename": "sprite6.mp4",
+      "title": "Motion Study 6",
+      "genre": "Ambient",
+      "songTitle": "Celestial Echoes",
+      "animationMethods": "Blender, Houdini"
+    },
+    {
+      "id": 7,
+      "filename": "sprite7.mp4",
+      "title": "Motion Study 7",
+      "genre": "Experimental",
+      "songTitle": "Liquid Light",
+      "animationMethods": "Cinema 4D, After Effects"
+    },
+    {
+      "id": 8,
+      "filename": "sprite8.mp4",
+      "title": "Motion Study 8",
+      "genre": "Techno",
+      "songTitle": "Electric Dreams",
+      "animationMethods": "Blender, After Effects"
+    },
+    {
+      "id": 9,
+      "filename": "sprite9.mp4",
+      "title": "Motion Study 9",
+      "genre": "House",
+      "songTitle": "Groove Machine",
+      "animationMethods": "Cinema 4D, Houdini"
+    },
+    {
+      "id": 10,
+      "filename": "sprite10.mp4",
+      "title": "Motion Study 10",
+      "genre": "Ambient",
+      "songTitle": "Echoes of Time",
+      "animationMethods": "Blender, After Effects"
+    },
+    {
+      "id": 11,
+      "filename": "sprite11.mp4",
+      "title": "Motion Study 11",
+      "genre": "Experimental",
+      "songTitle": "Kaleidoscope",
+      "animationMethods": "Cinema 4D, After Effects"
+    },
+    {
+      "id": 12,
+      "filename": "sprite12.mp4",
+      "title": "Motion Study 12",
+      "genre": "Techno",
+      "songTitle": "Cybernetic Pulse",
+      "animationMethods": "Blender, Houdini"
+    },
+    {
+      "id": 13,
+      "filename": "sprite13.mp4",
+      "title": "Motion Study 13",
+      "genre": "House",
+      "songTitle": "Bassline Groove",
+      "animationMethods": "Cinema 4D, After Effects"
+    },
+    {
+      "id": 14,
+      "filename": "sprite14.mp4",
+      "title": "Motion Study 14",
+      "genre": "Ambient",
+      "songTitle": "Dreamscape",
+      "animationMethods": "Blender, After Effects"
+    },
+    {
+      "id": 15,
+      "filename": "sprite15.mp4",
+      "title": "Motion Study 15",
+      "genre": "Experimental",
+      "songTitle": "Fluid Dynamics",
+      "animationMethods": "Cinema 4D, Houdini"
+    },
+    {
+      "id": 16,
+      "filename": "sprite16.mp4",
+      "title": "Motion Study 16",
+      "genre": "Techno",
+      "songTitle": "Digital Pulse",
+      "animationMethods": "Blender, After Effects"
+    },
+    {
+      "id": 17,
+      "filename": "sprite17.mp4",
+      "title": "Motion Study 17",
+      "genre": "House",
+      "songTitle": "Rhythm of the Night",
+      "animationMethods": "Cinema 4D, After Effects"
+    },
+    {
+      "id": 18,
+      "filename": "sprite18.mp4",
+      "title": "Motion Study 18",
+      "genre": "Ambient",
+      "songTitle": "Whispers in the Wind",
+      "animationMethods": "Blender, Houdini"
+    },
+    {
+      "id": 19,
+      "filename": "sprite19.mp4",
+      "title": "Motion Study 19",
+      "genre": "Experimental",
+      "songTitle": "Sonic Waves",
+      "animationMethods": "Cinema 4D, After Effects"
+    },
+    {
+      "id": 20,
+      "filename": "sprite20.mp4",
+      "title": "Motion Study 20",
+      "genre": "Foo",
+      "songTitle": "Bar",
+      "animationMethods": "Pizzaz"
     }
   ]
 }

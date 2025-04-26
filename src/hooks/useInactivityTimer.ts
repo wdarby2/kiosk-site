@@ -1,0 +1,1 @@
+// Inactivity timer hook implementation

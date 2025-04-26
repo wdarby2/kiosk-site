@@ -1,0 +1,20 @@
+{
+  "sprites": [
+    {
+      "id": 1,
+      "filename": "sprite1.mp4",
+      "title": "Motion Study 1",
+      "genre": "Electronic",
+      "songTitle": "Digital Waves",
+      "animationMethods": "After Effects, Cinema 4D"
+    },
+    {
+      "id": 2,
+      "filename": "sprite2.mp4",
+      "title": "Motion Study 2",
+      "genre": "Ambient",
+      "songTitle": "Floating Particles",
+      "animationMethods": "Blender, After Effects"
+    }
+  ]
+}

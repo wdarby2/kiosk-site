@@ -248,7 +248,7 @@ const App: React.FC = () => {
               bottom: '20px',
               left: '50%',
               transform: 'translateX(-50%)',
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              backgroundColor: 'rgba(50, 50, 50, 0.9)',
               color: 'white',
               padding: '20px 30px',
               borderRadius: '10px',

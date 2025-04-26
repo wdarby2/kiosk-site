@@ -16,8 +16,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
   padding: 0;
-  background-color: #121212; /* Dark background for immersive gallery feel */
-  color: #f5f5f5;
+  background-color: #ffffff; /* White background as requested */
+  color: #333333;
   line-height: 1.5;
   overflow: hidden; /* Prevent any scrolling on kiosk display */
   height: 100vh;
@@ -52,10 +52,10 @@ button {
   min-width: 44px;
 }
 
-/* For the final project, we'll use this dark theme */
+/* Light theme for the project */
 .dark-theme {
-  background-color: black;
-  color: white;
+  background-color: white;
+  color: #333333;
   overflow: hidden;
 }
 

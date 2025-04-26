@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import VideoThumbnail from '../VideoThumbnail';
 import { Sprite } from '../../types';
+import { staggeredAnimation, EASING, TIMING } from '../../utils/animations';
 
 interface GridProps {
   sprites: Sprite[];
@@ -12,6 +13,7 @@ interface GridProps {
 /**
  * Grid component for displaying sprite thumbnails
  * Optimized for 27" iMac in fullscreen (4x5 grid layout)
+ * Enhanced with staggered entrance animations
  */
 const Grid: React.FC<GridProps> = ({ 
   sprites, 
@@ -58,6 +60,13 @@ const Grid: React.FC<GridProps> = ({
               flexDirection: 'column',
               // Use CSS variables for staggered animations
               ['--item-index' as any]: index,
+              opacity: 0, // Start invisible for entrance animation
+              animation: isLoaded ? 
+                `scaleIn 400ms ${EASING.easeOut} forwards` : 'none',
+              animationDelay: isLoaded ? 
+                `${100 + (index * 50)}ms` : '0ms', // Staggered delay
+              transform: 'scale(0.95)', // Starting scale for entrance animation
+              willChange: 'opacity, transform',
             }} 
             className="grid-item"
           >
@@ -70,6 +79,28 @@ const Grid: React.FC<GridProps> = ({
           </div>
         ))}
       </div>
+
+      {/* Animation keyframes */}
+      <style>{`
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        .grid-container {
+          opacity: ${isLoaded ? 1 : 0};
+          transition: opacity 400ms ease-out;
+        }
+        
+        .grid-container.loaded {
+          opacity: 1;
+        }
+      `}</style>
     </div>
   );
 };

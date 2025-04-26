@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import useVideoPlayback from '../../hooks/useVideoPlayback';
 import { Sprite } from '../../types';
-import { getVideoPath } from '../../utils';
+import { TIMING, EASING } from '../../utils/animations';
 
 interface VideoThumbnailProps {
   sprite: Sprite;
@@ -18,6 +18,9 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
   previewMode = true, // Default to true for grid view
   className = '',
 }) => {
+  // Track hover state for enhanced animations
+  const [isHovered, setIsHovered] = useState(false);
+  
   // Use our custom hook for video playback
   const [videoRef, videoState, videoControls] = useVideoPlayback(
     sprite.filename,
@@ -34,12 +37,14 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
 
   // Handle mouse interactions for preview mode
   const handleMouseEnter = () => {
+    setIsHovered(true);
     if (previewMode && !videoState.isPlaying) {
       videoControls.play();
     }
   };
 
   const handleMouseLeave = () => {
+    setIsHovered(false);
     if (previewMode && videoState.isPlaying && !isActive) {
       videoControls.pause();
     }
@@ -61,7 +66,7 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
 
   return (
     <div 
-      className={`video-thumbnail ${isActive ? 'active' : ''} ${className}`}
+      className={`video-thumbnail ${isActive ? 'active' : ''} ${isHovered ? 'hovered' : ''} ${className}`}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -75,7 +80,16 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         position: 'relative',
         cursor: onClick ? 'pointer' : 'default',
         border: isActive ? '3px solid #4a90e2' : '3px solid transparent',
-        boxShadow: '0 4px 8px rgba(0,0,0,0.1)', // Subtle shadow for depth
+        boxShadow: isHovered ? 
+          '0 8px 16px rgba(0,0,0,0.2), 0 0 0 2px rgba(255,255,255,0.1)' : 
+          '0 4px 8px rgba(0,0,0,0.1)',
+        transform: isHovered ? 'scale(1.03)' : 'scale(1)',
+        transition: `
+          transform ${TIMING.standard}ms ${EASING.emphasized},
+          box-shadow ${TIMING.standard}ms ${EASING.easeOut},
+          border ${TIMING.standard}ms ${EASING.easeOut}
+        `,
+        willChange: 'transform, box-shadow',
       }}
     >
       {/* Video element */}
@@ -102,12 +116,55 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
         color: '#fff',
         padding: '1rem',
-        opacity: isActive ? 1 : 0.8,
-        transition: 'opacity 0.3s ease',
+        opacity: isHovered || isActive ? 1 : 0.8,
+        transform: isHovered ? 'translateY(0)' : 'translateY(3px)',
+        transition: `
+          opacity ${TIMING.standard}ms ${EASING.easeOut},
+          transform ${TIMING.standard}ms ${EASING.easeOut}
+        `,
       }}>
-        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 'bold' }}>{sprite.title}</h3>
-        <p style={{ margin: '0.25rem 0 0', fontSize: '0.8rem', opacity: 0.8 }}>{sprite.genre}</p>
+        <h3 
+          style={{ 
+            margin: 0, 
+            fontSize: '1rem', 
+            fontWeight: 'bold',
+            transform: isHovered ? 'translateY(0)' : 'translateY(2px)',
+            transition: `transform ${TIMING.standard}ms ${EASING.easeOut}`,
+          }}
+        >
+          {sprite.title}
+        </h3>
+        <p 
+          style={{ 
+            margin: '0.25rem 0 0', 
+            fontSize: '0.8rem', 
+            opacity: isHovered ? 1 : 0.8,
+            transform: isHovered ? 'translateY(0)' : 'translateY(2px)',
+            transition: `
+              opacity ${TIMING.standard}ms ${EASING.easeOut},
+              transform ${TIMING.standard}ms ${EASING.easeOut} ${TIMING.fast}ms
+            `,
+          }}
+        >
+          {sprite.genre}
+        </p>
       </div>
+
+      {/* Hover overlay effect */}
+      {isHovered && !isActive && (
+        <div 
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%)',
+            pointerEvents: 'none',
+            animation: 'fadeIn 300ms ease forwards',
+          }}
+        />
+      )}
 
       {/* Loading indicator */}
       {!videoState.isLoaded && (
@@ -130,13 +187,6 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
             borderTop: '4px solid #fff',
             animation: 'spin 1s linear infinite',
           }}></div>
-
-          <style>{`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}</style>
         </div>
       )}
 
@@ -155,7 +205,7 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           opacity: videoState.isPlaying ? 0 : 0.8,
-          transition: 'opacity 0.3s ease',
+          transition: `opacity ${TIMING.standard}ms ${EASING.easeOut}`,
         }}>
           <div style={{
             width: 0,
@@ -167,6 +217,25 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           }}></div>
         </div>
       )}
+
+      {/* Animation keyframes */}
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes pulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.02); }
+          100% { transform: scale(1); }
+        }
+      `}</style>
     </div>
   );
 };

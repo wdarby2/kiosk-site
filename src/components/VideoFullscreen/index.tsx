@@ -193,12 +193,13 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
           }
         }}
         aria-label="Close"
+        className="close-button"
         style={{
           position: 'absolute',
           top: '20px',
           right: '20px',
-          width: '40px',
-          height: '40px',
+          width: '46px',
+          height: '46px',
           backgroundColor: 'rgba(0,0,0,0.5)',
           border: 'none',
           borderRadius: '50%',
@@ -209,9 +210,32 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          opacity: 0,
+          transform: 'scale(0.9)',
+          animation: 'scaleIn 400ms ease-out 300ms forwards',
+          transition: 'background-color 250ms ease, transform 250ms ease',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(74, 144, 226, 0.7)';
+          e.currentTarget.style.transform = 'scale(1.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.5)';
+          e.currentTarget.style.transform = 'scale(1)';
         }}
       >
-        ✕
+        <span style={{
+          display: 'inline-block',
+          lineHeight: 1,
+          transition: 'transform 250ms ease',
+        }}>✕</span>
+
+        <style>{`
+          @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+          }
+        `}</style>
       </button>
 
       {/* Video element - filling available space */}
@@ -253,12 +277,14 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
           color: '#fff',
           textShadow: '0 2px 4px rgba(0,0,0,0.7)',
           zIndex: 5,
+          animation: 'fadeInDown 500ms ease-out forwards',
         }}>
           <h2 style={{ 
             margin: 0, 
             fontSize: '2rem', 
             fontWeight: 'bold',
             letterSpacing: '0.5px',
+            animation: 'slideInRight 600ms ease-out forwards',
           }}>
             {sprite.title}
           </h2>
@@ -274,12 +300,17 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
+              opacity: 0,
+              transform: 'translateX(-20px)',
+              animation: 'slideInRight 400ms ease-out 200ms forwards',
             }}>
               <span style={{ 
                 backgroundColor: 'rgba(255, 255, 255, 0.2)', 
                 padding: '2px 10px',
                 borderRadius: '4px',
                 fontSize: '0.9rem',
+                opacity: 0.8,
+                transition: 'opacity 250ms ease, transform 250ms ease, background-color 250ms ease',
               }}>
                 Genre
               </span>
@@ -291,12 +322,17 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
+              opacity: 0,
+              transform: 'translateX(-20px)',
+              animation: 'slideInRight 400ms ease-out 300ms forwards',
             }}>
               <span style={{ 
                 backgroundColor: 'rgba(255, 255, 255, 0.2)', 
                 padding: '2px 10px',
                 borderRadius: '4px',
                 fontSize: '0.9rem',
+                opacity: 0.8,
+                transition: 'opacity 250ms ease, transform 250ms ease, background-color 250ms ease',
               }}>
                 Music
               </span>
@@ -308,18 +344,35 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
+              opacity: 0,
+              transform: 'translateX(-20px)',
+              animation: 'slideInRight 400ms ease-out 400ms forwards',
             }}>
               <span style={{ 
                 backgroundColor: 'rgba(255, 255, 255, 0.2)', 
                 padding: '2px 10px',
                 borderRadius: '4px',
                 fontSize: '0.9rem',
+                opacity: 0.8,
+                transition: 'opacity 250ms ease, transform 250ms ease, background-color 250ms ease',
               }}>
                 Animation
               </span>
               <span>{sprite.animationMethods}</span>
             </p>
           </div>
+
+          <style>{`
+            @keyframes fadeInDown {
+              from { opacity: 0; transform: translateY(-20px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            
+            @keyframes slideInRight {
+              from { opacity: 0; transform: translateX(-20px); }
+              to { opacity: 1; transform: translateX(0); }
+            }
+          `}</style>
         </div>
 
         {/* Play/pause indicator in the center */}

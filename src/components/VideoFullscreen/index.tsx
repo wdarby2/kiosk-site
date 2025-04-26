@@ -7,6 +7,7 @@ interface VideoFullscreenProps {
   onClose?: () => void;
   autoPlay?: boolean;
   className?: string;
+  onInteraction?: () => void; // Add prop for interaction events
 }
 
 const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
@@ -14,7 +15,15 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
   onClose,
   autoPlay = true,
   className = '',
+  onInteraction,
 }) => {
+  // Handler for user interactions
+  const handleInteraction = () => {
+    console.log('VideoFullscreen: User interaction detected');
+    if (onInteraction) {
+      onInteraction();
+    }
+  };
   // Use our custom hook for video playback
   const [videoRef, videoState, videoControls] = useVideoPlayback(
     sprite.filename,
@@ -94,6 +103,7 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
 
   // Handle seek on progress bar click
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Don't stop propagation - allow the click to bubble up to parent components
     const progressBar = e.currentTarget;
     const rect = progressBar.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
@@ -103,6 +113,9 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
       const newTime = percentage * videoState.duration;
       videoControls.seek(newTime);
     }
+    
+    // Track interaction
+    handleInteraction();
   };
 
   // Error state fallback
@@ -164,10 +177,21 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
         flexDirection: 'column',
         zIndex: 1000,
       }}
+      onClick={handleInteraction}
+      onMouseMove={handleInteraction}
+      onTouchStart={handleInteraction}
+      onKeyDown={handleInteraction}
     >
       {/* Close button */}
       <button
-        onClick={onClose}
+        onClick={(e) => {
+          // Call the interaction handler
+          handleInteraction();
+          // Call the close handler but don't stop propagation
+          if (onClose) {
+            onClose();
+          }
+        }}
         aria-label="Close"
         style={{
           position: 'absolute',
@@ -190,39 +214,112 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
         ✕
       </button>
 
-      {/* Video element */}
+      {/* Video element - filling available space */}
       <div style={{
         flex: 1,
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: 'stretch',
+        justifyContent: 'stretch',
         position: 'relative',
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
       }}>
         <video
           ref={videoRef}
           style={{
-            maxWidth: '100%',
-            maxHeight: '100%',
-            width: 'auto',
-            height: 'auto',
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover', // Fill the entire container while maintaining aspect ratio
+            objectPosition: 'center',
+            backgroundColor: '#000',
           }}
-          onClick={videoControls.toggle}
+          onClick={(e) => {
+            // Toggle playback
+            videoControls.toggle();
+            // Track interaction
+            handleInteraction();
+          }}
         />
 
-        {/* Video info overlay at the top */}
+        {/* Enhanced video info overlay at the top */}
         <div style={{
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
-          padding: '20px',
-          background: 'linear-gradient(rgba(0,0,0,0.8), transparent)',
+          padding: '30px',
+          background: 'linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.7) 40%, transparent)',
           color: '#fff',
+          textShadow: '0 2px 4px rgba(0,0,0,0.7)',
+          zIndex: 5,
         }}>
-          <h2 style={{ margin: 0, fontSize: '1.5rem' }}>{sprite.title}</h2>
-          <p style={{ margin: '0.5rem 0 0', opacity: 0.8 }}>
-            {sprite.genre} • {sprite.songTitle} • {sprite.animationMethods}
-          </p>
+          <h2 style={{ 
+            margin: 0, 
+            fontSize: '2rem', 
+            fontWeight: 'bold',
+            letterSpacing: '0.5px',
+          }}>
+            {sprite.title}
+          </h2>
+          <div style={{ 
+            margin: '1rem 0 0.5rem', 
+            display: 'flex', 
+            flexDirection: 'column',
+            gap: '8px',
+          }}>
+            <p style={{ 
+              margin: 0, 
+              fontSize: '1.2rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}>
+              <span style={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+                padding: '2px 10px',
+                borderRadius: '4px',
+                fontSize: '0.9rem',
+              }}>
+                Genre
+              </span>
+              <span>{sprite.genre}</span>
+            </p>
+            <p style={{ 
+              margin: 0, 
+              fontSize: '1.2rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}>
+              <span style={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+                padding: '2px 10px',
+                borderRadius: '4px',
+                fontSize: '0.9rem',
+              }}>
+                Music
+              </span>
+              <span>{sprite.songTitle}</span>
+            </p>
+            <p style={{ 
+              margin: 0, 
+              fontSize: '1.2rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}>
+              <span style={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+                padding: '2px 10px',
+                borderRadius: '4px',
+                fontSize: '0.9rem',
+              }}>
+                Animation
+              </span>
+              <span>{sprite.animationMethods}</span>
+            </p>
+          </div>
         </div>
 
         {/* Play/pause indicator in the center */}
@@ -353,7 +450,11 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
           }}>
             {/* Play/Pause button */}
             <button
-              onClick={videoControls.toggle}
+              onClick={(e) => {
+                videoControls.toggle();
+                // Track interaction
+                handleInteraction();
+              }}
               aria-label={videoState.isPlaying ? 'Pause' : 'Play'}
               style={{
                 backgroundColor: 'transparent',
@@ -377,7 +478,11 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
 
             {/* Mute button */}
             <button
-              onClick={videoControls.toggleMute}
+              onClick={(e) => {
+                videoControls.toggleMute();
+                // Track interaction
+                handleInteraction();
+              }}
               aria-label={videoState.isMuted ? 'Unmute' : 'Mute'}
               style={{
                 backgroundColor: 'transparent',
@@ -408,7 +513,11 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
           <div>
             {/* Reset button */}
             <button
-              onClick={videoControls.reset}
+              onClick={(e) => {
+                videoControls.reset();
+                // Track interaction
+                handleInteraction();
+              }}
               aria-label="Restart"
               style={{
                 backgroundColor: 'transparent',

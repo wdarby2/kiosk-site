@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Home from './pages/Home';
 import SpritePage from './pages/SpritePage';
 import Navigation from './components/Navigation';
 import ErrorBoundary from './components/ErrorBoundary';
+import { Sprite } from './types';
 
 // Define available pages
 enum Page {
@@ -14,100 +15,115 @@ enum Page {
 const App: React.FC = () => {
   // Application state
   const [currentPage, setCurrentPage] = useState<Page>(Page.HOME);
-  const [selectedSprite, setSelectedSprite] = useState<any>(null);
-  const [isInactive, setIsInactive] = useState(false);
-  const [lastActivity, setLastActivity] = useState(Date.now());
-  const [showWarning, setShowWarning] = useState(false);
-  const [countdown, setCountdown] = useState(5);
+  const [selectedSprite, setSelectedSprite] = useState<Sprite | null>(null);
   
-  // Constants
-  const INACTIVITY_TIMEOUT = 10000; // 10 seconds for testing
-  const WARNING_TIME = 3000; // Show warning 3 seconds before timeout
+  // Inactivity timer for the sprite page
+  const [showWarning, setShowWarning] = useState(false);
+  const [countdown, setCountdown] = useState(3);
+  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const warningTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Clear all timers
+  const clearAllTimers = () => {
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+      inactivityTimerRef.current = null;
+    }
+    if (warningTimerRef.current) {
+      clearTimeout(warningTimerRef.current);
+      warningTimerRef.current = null;
+    }
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    setShowWarning(false);
+  };
+  
+  // Start the inactivity timer
+  const startInactivityTimer = () => {
+    // Clear any existing timers first
+    clearAllTimers();
+    
+    // Only start timer on sprite page
+    if (currentPage !== Page.SPRITE) return;
+    
+    console.log('App: Starting inactivity timer');
+    
+    // Set warning timer (7 seconds into the 10-second inactivity period)
+    warningTimerRef.current = setTimeout(() => {
+      console.log('App: Warning timer triggered');
+      setShowWarning(true);
+      setCountdown(3); // 3 seconds warning
+      
+      // Countdown timer
+      countdownRef.current = setInterval(() => {
+        setCountdown(prev => {
+          const newVal = prev - 1;
+          console.log(`App: Countdown ${newVal}`);
+          if (newVal <= 0) {
+            if (countdownRef.current) {
+              clearInterval(countdownRef.current);
+              countdownRef.current = null;
+            }
+            return 0;
+          }
+          return newVal;
+        });
+      }, 1000);
+    }, 7000);
+    
+    // Main inactivity timer (10 seconds)
+    inactivityTimerRef.current = setTimeout(() => {
+      console.log('App: Inactivity timeout reached, navigating to home');
+      goHome();
+    }, 10000);
+  };
+  
+  // Reset the inactivity timer
+  const resetInactivityTimer = () => {
+    if (currentPage === Page.SPRITE) {
+      console.log('App: Resetting inactivity timer');
+      clearAllTimers();
+      startInactivityTimer();
+    }
+  };
+  
+  // Effect to start/stop timer when page changes
+  useEffect(() => {
+    if (currentPage === Page.SPRITE) {
+      startInactivityTimer();
+    } else {
+      clearAllTimers();
+    }
+    
+    // Cleanup on unmount
+    return clearAllTimers;
+  }, [currentPage]);
   
   // Navigation functions
-  const navigate = (page: Page, sprite?: any) => {
+  const navigate = (page: Page, sprite?: Sprite) => {
+    console.log(`App: Navigating to ${page}`, sprite);
     setCurrentPage(page);
     if (sprite) {
       setSelectedSprite(sprite);
     }
-    resetInactivityTimer();
   };
   
   const goHome = () => {
+    console.log('App: Navigating to HOME');
+    clearAllTimers();
     setCurrentPage(Page.HOME);
     setSelectedSprite(null);
-    resetInactivityTimer();
   };
   
-  // Reset inactivity timer
-  const resetInactivityTimer = () => {
-    setLastActivity(Date.now());
-    setIsInactive(false);
-    setShowWarning(false);
-  };
-  
-  // Check for inactivity
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const timeSinceLastActivity = now - lastActivity;
-      
-      // If we've passed the warning threshold but not the timeout
-      if (timeSinceLastActivity > (INACTIVITY_TIMEOUT - WARNING_TIME) && 
-          timeSinceLastActivity < INACTIVITY_TIMEOUT && 
-          !showWarning && !isInactive) {
-        console.log('Showing inactivity warning');
-        setShowWarning(true);
-        setCountdown(Math.ceil(WARNING_TIME / 1000));
-      }
-      
-      // If we've passed the timeout
-      if (timeSinceLastActivity >= INACTIVITY_TIMEOUT && !isInactive) {
-        console.log('Inactivity timeout reached');
-        setIsInactive(true);
-        setShowWarning(false);
-        setCurrentPage(Page.HOME);
-      }
-    }, 1000);
-    
-    return () => clearInterval(interval);
-  }, [lastActivity, isInactive, showWarning, INACTIVITY_TIMEOUT, WARNING_TIME]);
-  
-  // Countdown effect
-  useEffect(() => {
-    let timer: NodeJS.Timeout | null = null;
-    
-    if (showWarning && countdown > 0) {
-      timer = setTimeout(() => {
-        setCountdown(c => c - 1);
-      }, 1000);
-    }
-    
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [showWarning, countdown]);
-  
-  // Set up global event listeners for user activity
-  useEffect(() => {
-    const handleActivity = () => {
+  // Handle user interaction (to reset timer)
+  const handleUserInteraction = () => {
+    if (currentPage === Page.SPRITE) {
       resetInactivityTimer();
-    };
-    
-    // Add event listeners
-    window.addEventListener('mousedown', handleActivity);
-    window.addEventListener('keydown', handleActivity);
-    window.addEventListener('touchstart', handleActivity);
-    window.addEventListener('click', handleActivity);
-    
-    // Clean up
-    return () => {
-      window.removeEventListener('mousedown', handleActivity);
-      window.removeEventListener('keydown', handleActivity);
-      window.removeEventListener('touchstart', handleActivity);
-      window.removeEventListener('click', handleActivity);
-    };
-  }, []);
+    }
+  };
   
   // Render the appropriate page based on current navigation state
   const renderPage = () => {
@@ -119,12 +135,13 @@ const App: React.FC = () => {
           />
         );
       case Page.SPRITE:
-        return (
+        return selectedSprite ? (
           <SpritePage 
             sprite={selectedSprite} 
             onClose={goHome}
+            onUserInteraction={handleUserInteraction}
           />
-        );
+        ) : null;
       default:
         return <Home onSpriteSelect={(sprite) => navigate(Page.SPRITE, sprite)} />;
     }
@@ -153,11 +170,12 @@ const App: React.FC = () => {
               padding: '15px 30px',
               borderRadius: '10px',
               boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-              zIndex: 1000,
+              zIndex: 2000,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               gap: '15px',
+              animation: 'fadeIn 0.3s forwards',
             }}
             onClick={resetInactivityTimer}
           >
@@ -166,7 +184,7 @@ const App: React.FC = () => {
                 Returning to home screen in {countdown} seconds
               </p>
               <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>
-                Touch screen to continue browsing
+                Touch screen to continue viewing
               </p>
             </div>
             
@@ -182,8 +200,15 @@ const App: React.FC = () => {
                 fontSize: '0.9rem',
               }}
             >
-              Continue Browsing
+              Continue Viewing
             </button>
+
+            <style>{`
+              @keyframes fadeIn {
+                from { opacity: 0; transform: translate(-50%, 20px); }
+                to { opacity: 1; transform: translate(-50%, 0); }
+              }
+            `}</style>
           </div>
         )}
       </div>

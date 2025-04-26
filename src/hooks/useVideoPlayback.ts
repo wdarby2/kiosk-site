@@ -76,9 +76,19 @@ export const useVideoPlayback = (
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
+      console.log(`Setting video src for ${filename} to: ${videoPath}`);
+      // Reset the video element
+      video.pause();
+      video.removeAttribute('src'); // Empty source
+      video.load(); // Reset the video element
+      
+      // Set the new source
       video.src = videoPath;
+      
+      // Load the new video
+      video.load();
     }
-  }, [videoPath, videoRef]);
+  }, [videoPath, filename]);
 
   // Play control
   const play = useCallback(() => {

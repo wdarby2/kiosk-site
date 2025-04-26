@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface UseInactivityTimerOptions {
   timeout?: number;
@@ -18,55 +18,70 @@ export const useInactivityTimer = (options: UseInactivityTimerOptions = {}) => {
     timeout = 60000, // Default to 60 seconds of inactivity
     onInactive,
     onActive,
-    events = ['mousedown', 'mousemove', 'keypress', 'touchstart', 'click', 'scroll'],
+    events = ['mousedown', 'keypress', 'touchstart', 'click'], // Reduced events, removed high-frequency ones
   } = options;
 
   const [isInactive, setIsInactive] = useState(false);
-  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const optionsRef = useRef(options);
+  
+  // Update ref when options change
+  useEffect(() => {
+    optionsRef.current = options;
+  }, [options]);
 
   // Function to reset the timer
   const resetTimer = useCallback(() => {
-    if (timer) {
-      clearTimeout(timer);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
     }
     
     // If we were inactive, trigger the active callback
     if (isInactive) {
       setIsInactive(false);
-      onActive?.();
+      optionsRef.current.onActive?.();
     }
 
     // Set a new timer
-    const newTimer = setTimeout(() => {
+    timerRef.current = setTimeout(() => {
       setIsInactive(true);
-      onInactive?.();
-    }, timeout);
-
-    setTimer(newTimer);
-  }, [isInactive, onActive, onInactive, timeout, timer]);
+      optionsRef.current.onInactive?.();
+    }, optionsRef.current.timeout || 60000);
+  }, [isInactive]);
 
   // Set up the initial timer
   useEffect(() => {
+    console.log('Setting up initial inactivity timer');
     resetTimer();
 
     // Clean up on unmount
     return () => {
-      if (timer) {
-        clearTimeout(timer);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
       }
     };
   }, [resetTimer]);
 
-  // Set up activity event listeners
+  // Set up activity event listeners - with reduced sensitivity
   useEffect(() => {
+    // To avoid frequent re-renders, we throttle the events
+    let lastActivity = Date.now();
+    const throttleDelay = 1000; // 1 second throttle
+    
     // Handler for all events
     const activityHandler = () => {
-      resetTimer();
+      const now = Date.now();
+      if (now - lastActivity > throttleDelay) {
+        lastActivity = now;
+        resetTimer();
+      }
     };
 
     // Add event listeners
     events.forEach((event) => {
-      window.addEventListener(event, activityHandler);
+      window.addEventListener(event, activityHandler, { passive: true });
     });
 
     // Clean up

@@ -79,15 +79,14 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         overflow: 'hidden',
         position: 'relative',
         cursor: onClick ? 'pointer' : 'default',
-        border: isActive ? '3px solid #4a90e2' : '3px solid transparent',
+        border: 'none',
         boxShadow: isHovered ? 
-          '0 8px 16px rgba(0,0,0,0.2), 0 0 0 2px rgba(255,255,255,0.1)' : 
+          '0 8px 16px rgba(0,0,0,0.15)' : 
           '0 4px 8px rgba(0,0,0,0.1)',
         transform: isHovered ? 'scale(1.03)' : 'scale(1)',
         transition: `
           transform ${TIMING.standard}ms ${EASING.emphasized},
-          box-shadow ${TIMING.standard}ms ${EASING.easeOut},
-          border ${TIMING.standard}ms ${EASING.easeOut}
+          box-shadow ${TIMING.standard}ms ${EASING.easeOut}
         `,
         willChange: 'transform, box-shadow',
       }}
@@ -103,7 +102,7 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           height: '100%',
           objectFit: 'cover',
           objectPosition: 'center',
-          borderRadius: '8px', // Match parent container's rounded corners
+          borderRadius: '12px', // Match parent container's rounded corners
         }}
       />
 

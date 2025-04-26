@@ -21,13 +21,16 @@ This application is designed to run on a 27" iMac in Chrome kiosk mode, providin
   - Implemented correct path patterns for all resources
   - Testing both direct video tag and JavaScript-created video elements
 
+**Completed Steps:**
+1. ✅ Project Setup & File Protocol Validation (Step 0)
+2. ✅ Core Video Functionality (Step 1)
+3. ✅ Navigation State Management (Step 2)
+4. ✅ Home Grid Layout (Step 3)
+
 **Next Steps:**
-1. Implement Core Video Functionality (Step 1)
-2. Create Navigation State Management (Step 2)
-3. Implement Home Grid Layout (Step 3)
-4. Build Individual Sprite Pages (Step 4)
-5. Add Transitions and Animations (Step 5)
-6. Complete Testing and Optimization (Step 6)
+5. Build Individual Sprite Pages (Step 4)
+6. Add Transitions and Animations (Step 5)
+7. Complete Testing and Optimization (Step 6)
 
 ## Key Features
 
@@ -99,11 +102,15 @@ To launch in Chrome kiosk mode (for production use):
 
 ```bash
 # macOS
-/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --kiosk file:///full/path/to/dist/index.html
+open -a "Google Chrome" --args --allow-file-access-from-files --kiosk file:///Users/andrew/projects/repos/kiosk-site/dist/index.html
 
 # Windows
-"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --kiosk file:///C:/path/to/dist/index.html
+"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --allow-file-access-from-files --kiosk file:///C:/path/to/dist/index.html
 ```
+
+**IMPORTANT: The `--allow-file-access-from-files` flag is required** to prevent CORS issues when loading files via the file:// protocol. Without this flag, videos and other resources won't load properly in Chrome.
+
+For the final installation on the 27" iMac, you can create a shell script that launches Chrome in kiosk mode with the required flags.
 
 ## Building for Production
 

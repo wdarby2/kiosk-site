@@ -18,8 +18,8 @@ export const getVideoPath = (filename: string, forceProtocolCheck: boolean = fal
   
   // Based on testing, these paths work best in different environments
   if (isFileProtocol) {
-    // For file:// protocol, these paths have been confirmed to work
-    return `./src/assets/videos/${filename}`;
+    // For file:// protocol in built distribution
+    return `./assets/videos/${filename}`;
   } else {
     // In development mode or production server, use one of these paths
     const isDevelopment = process.env.NODE_ENV === 'development';

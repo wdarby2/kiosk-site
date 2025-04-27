@@ -116,32 +116,60 @@ const Home: React.FC<HomeProps> = ({ onSpriteSelect }) => {
       height: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      paddingTop: '60px', // Space for navigation
+      padding: '50px 100px', // 50px top/bottom, 100px left/right margins
       boxSizing: 'border-box',
       overflow: 'hidden', // Prevent scrolling
-      alignItems: 'center', // Center content horizontally
+      position: 'relative', // Position context for content
     }}>
-      <h1 style={{ 
-        textAlign: 'center',  // Center-align the title
-        margin: '0 0 5px',  // Minimal margin
-        width: '100%',
-        fontSize: 'clamp(1rem, 1.2vw, 1.5rem)', // Small font size
-        lineHeight: 1.1, // Super tight line height
-        fontWeight: 'normal', // Reduce the visual weight
+      {/* Content container that holds both title and grid */}
+      <div className="content-container" style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center', // Center the container itself
+        width: '100%', // Full width of parent (which has the margins)
+        padding: '0',
       }}>
-        Motion Study Sprites
-      </h1>
-      
-      {sprites.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <p>No sprites found. Please check the data source.</p>
+        {/* Fixed-width shared container for title and grid */}
+        <div className="fixed-width-container" style={{
+          width: 'fit-content', // Width based on content (grid size)
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start', // Left-align children 
+        }}>
+          {/* Title aligned to the left */}
+          <div className="title-container" id="title-container" style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'flex-start', // Left-align the title
+            marginBottom: '0.5rem', // Slightly increased margin below title for better spacing
+            paddingLeft: '0', // No padding to match grid alignment
+          }}>
+          <h1 style={{ 
+            textAlign: 'left',  // Left-align the title text
+            margin: 0,  // No margin
+            fontSize: 'clamp(1.5rem, 2vw, 2.2rem)', // Increased font size for better prominence
+            lineHeight: 1.2, // Slightly increased line height
+            fontWeight: 'normal', // Reduce the visual weight
+            width: 'auto', // Size based on content
+            paddingLeft: '0', // No padding
+          }}>
+            Motion Study Sprites
+          </h1>
         </div>
-      ) : (
-        <Grid 
-          sprites={sprites}
-          onSpriteSelect={handleSpriteClick}
-        />
-      )}
+        
+          {/* Grid component */}
+          {sprites.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '2rem', width: '100%' }}>
+              <p>No sprites found. Please check the data source.</p>
+            </div>
+          ) : (
+            <Grid 
+              sprites={sprites}
+              onSpriteSelect={handleSpriteClick}
+            />
+          )}
+        </div> {/* End of fixed-width-container */}
+      </div>
     </div>
   );
 };

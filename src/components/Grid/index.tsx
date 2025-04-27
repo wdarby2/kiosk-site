@@ -32,15 +32,16 @@ const Grid: React.FC<GridProps> = ({
   const calculateCellSize = useCallback(() => {
     if (!gridContainerRef.current) return;
     
-    const container = gridContainerRef.current;
-    const containerRect = container.getBoundingClientRect();
+    // Get viewport dimensions
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
     
-    // Available width and height for the grid
-    const availableWidth = containerRect.width * 0.95; // 95% of container width
-    const availableHeight = containerRect.height * 0.95; // 95% of container height
+    // Calculate available space accounting for margins
+    const availableWidth = viewportWidth - 250; // 100px left and right margins + some buffer
+    const availableHeight = viewportHeight - 180; // 50px top and bottom margins + space for title and header
     
-    // Fixed gap size in pixels (more predictable than vh/vw units)
-    const gapSize = Math.min(window.innerWidth, window.innerHeight) * 0.015; // 1.5% of viewport smallest dimension
+    // Use a smaller gap size to allow for larger thumbnails
+    const gapSize = Math.max(10, Math.min(window.innerWidth, window.innerHeight) * 0.01); // 1% of smallest dimension
     
     // Calculate maximum possible cell width considering gaps
     const maxCellWidth = (availableWidth - (gapSize * (columnCount - 1))) / columnCount;
@@ -51,7 +52,10 @@ const Grid: React.FC<GridProps> = ({
     // Use the smaller of the two to ensure square cells that fit within constraints
     const optimalCellSize = Math.floor(Math.min(maxCellWidth, maxCellHeight));
     
-    setCellSize(optimalCellSize);
+    // Ensure minimum size for visibility, but make it larger
+    const finalSize = Math.max(120, optimalCellSize);
+    
+    setCellSize(finalSize);
   }, [rowCount, columnCount]);
   
   // Recalculate on resize
@@ -81,31 +85,33 @@ const Grid: React.FC<GridProps> = ({
       ref={gridContainerRef}
       className={`grid-container ${isLoaded ? 'loaded' : ''}`} 
       style={{
-        width: '100%', // Use 100% to respect parent container size
-        height: 'calc(100vh - 80px)', // Ensure it fits below header
+        width: '100%', // Full width of parent
+        height: 'calc(100vh - 150px)', // Adjusted for margins and title
         padding: '0', // No padding, let grid component handle spacing
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: 'flex-start', // Left-align to match our shared container approach
+        justifyContent: 'center', // Center vertically only
+        marginTop: '0', // Remove margin as the title's margin handles the spacing
       }}
     >
       {cellSize > 0 && (
         <div className="sprites-grid" style={{
           display: 'grid',
-          gridTemplateColumns: `repeat(${columnCount}, ${cellSize}px)`, // Fixed size columns
-          gridTemplateRows: `repeat(${rowCount}, ${cellSize}px)`, // Fixed size rows
-          justifyContent: 'center', // Center the grid horizontally
-          gap: `${Math.min(window.innerWidth, window.innerHeight) * 0.015}px`, // Fixed pixel gap
-          margin: '0 auto', // Center the grid
+          gridTemplateColumns: `repeat(${columnCount}, minmax(0, ${cellSize}px))`, // Responsive columns with max size
+          gridTemplateRows: `repeat(${rowCount}, minmax(0, ${cellSize}px))`, // Responsive rows with max size
+          justifyContent: 'start', // Left-align the grid items
+          gap: `clamp(0.75rem, 1.25vw, 1.75rem)`, // Responsive gap
+          margin: '0',
+          width: 'fit-content', // Width based on content
         }}>
           {sprites.map((sprite, index) => (
             <div 
               key={sprite.id} 
               style={{
-                width: `${cellSize}px`,
-                height: `${cellSize}px`,
+                width: '100%', // Use full width of grid cell
+                height: '100%', // Use full height of grid cell
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -118,6 +124,8 @@ const Grid: React.FC<GridProps> = ({
                   `${100 + (index * 30)}ms` : '0ms', // Faster staggered delay
                 transform: 'scale(0.95)', // Starting scale for entrance animation
                 willChange: 'opacity, transform',
+                maxWidth: `${cellSize}px`, // Maximum width
+                maxHeight: `${cellSize}px`, // Maximum height
               }} 
               className="grid-item"
             >

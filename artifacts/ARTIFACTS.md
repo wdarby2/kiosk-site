@@ -66,10 +66,12 @@ We've analyzed the video files to ensure they meet our requirements:
 - **Duration**: ~18 seconds
 
 These specifications are well-suited for our kiosk application:
-- H.264 ensures compatibility across browsers
+- H.264 ensures compatibility across browsers and local playback
 - 720p resolution is sufficient for thumbnails and scales well for fullscreen view
 - The moderate bitrate allows for multiple simultaneous video playback
-- The video files are properly formatted for web playback
+- The video files are properly formatted for local filesystem playback
+
+**Important File Protocol Consideration**: Since the application will run from the local filesystem using the file:// protocol, all video references must use relative paths (e.g., './assets/videos/sprite1.mp4'). A custom file copying solution will be implemented to ensure videos are predictably located and accessible when running from the filesystem.
 
 ### Metadata Format
 We've created a structured JSON format for sprite metadata:
@@ -148,17 +150,57 @@ We've set up the following configuration files:
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import fs from 'fs';
+
+// Custom plugin to ensure proper video file handling for file:// protocol
+function ensureVideosPlugin() {
+  return {
+    name: 'ensure-videos-plugin',
+    closeBundle() {
+      // Copy videos with their original filenames to maintain predictable paths
+      const srcDir = resolve(__dirname, 'src/assets/videos');
+      const outDir = resolve(__dirname, 'dist/assets/videos');
+      
+      if (!fs.existsSync(outDir)) {
+        fs.mkdirSync(outDir, { recursive: true });
+      }
+      
+      fs.readdirSync(srcDir).forEach(file => {
+        if (file.endsWith('.mp4')) {
+          fs.copyFileSync(
+            resolve(srcDir, file),
+            resolve(outDir, file)
+          );
+        }
+      });
+    }
+  };
+}
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    ensureVideosPlugin() // Add our custom plugin
+  ],
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
     },
   },
+  // Critical: Use relative paths for file:// protocol compatibility
+  base: './',
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    // Prevent filename hashing to ensure predictable paths for file:// protocol
+    assetsInlineLimit: 0,
+    rollupOptions: {
+      output: {
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name][extname]'
+      }
+    }
   },
   server: {
     open: true
@@ -202,7 +244,29 @@ export default {
   </head>
   <body>
     <div id="root"></div>
+    <!-- 
+      Important: Use relative module path for file:// protocol compatibility
+      This will be transformed by Vite to use the correct path in the build
+     -->
     <script type="module" src="/src/index.tsx"></script>
+  </body>
+</html>
+```
+
+#### Output HTML after build (for file:// protocol)
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Motion Study Sprites</title>
+    <!-- Note the relative paths with ./ prefix for file:// protocol compatibility -->
+    <script type="module" crossorigin src="./assets/index.js"></script>
+    <link rel="stylesheet" href="./assets/index.css">
+  </head>
+  <body>
+    <div id="root"></div>
   </body>
 </html>
 ```

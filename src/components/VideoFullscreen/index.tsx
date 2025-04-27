@@ -25,17 +25,14 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
     }
   };
   // Use our custom hook for video playback
-  const [videoRef, videoState, videoControls] = useVideoPlayback(
-    sprite.filename,
-    {
-      autoPlay: true, // Always autoplay
-      loop: true,
-      muted: false, // Fullscreen videos should have sound
-      playsInline: true,
-      controls: false, // No controls
-      forceProtocolCheck: true,
-    }
-  );
+  const [videoRef, videoState, videoControls] = useVideoPlayback(sprite.filename, {
+    autoPlay: true, // Always autoplay
+    loop: true,
+    muted: false, // Fullscreen videos should have sound
+    playsInline: true,
+    controls: false, // No controls
+    forceProtocolCheck: true,
+  });
 
   // Handle keyboard events for escape only (to close the video)
   useEffect(() => {
@@ -54,11 +51,10 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
     };
   }, [onClose]);
 
-
   // Error state fallback
   if (videoState.hasError) {
     return (
-      <div 
+      <div
         className={`video-fullscreen error ${className}`}
         style={{
           position: 'fixed',
@@ -74,14 +70,16 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
           zIndex: 1000,
         }}
       >
-        <div style={{
-          color: '#fff',
-          textAlign: 'center',
-          padding: '2rem',
-        }}>
+        <div
+          style={{
+            color: '#fff',
+            textAlign: 'center',
+            padding: '2rem',
+          }}
+        >
           <h2 style={{ marginBottom: '1rem' }}>{sprite.title}</h2>
           <p style={{ marginBottom: '2rem' }}>Unable to load video</p>
-          <button 
+          <button
             onClick={onClose}
             style={{
               padding: '0.75rem 1.5rem',
@@ -100,8 +98,97 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
     );
   }
 
+  // Add a transparent overlay to block all mouse events in the upper-right corner
+  React.useEffect(() => {
+    // Create a style tag for our CSS
+    const styleTag = document.createElement('style');
+    styleTag.textContent = `
+      .return-button-wrapper {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        z-index: 99999;
+        pointer-events: none;
+      }
+      
+      .return-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 46px;
+        height: 46px;
+        background-color: rgba(211, 211, 211, 0.2); /* Light gray with 20% opacity */
+        border: none;
+        border-radius: 50%;
+        color: rgba(255, 255, 255, 1); /* White text */
+        font-size: 24px;
+        cursor: pointer;
+        pointer-events: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        padding: 0;
+        line-height: 1;
+      }
+      
+      /* Fix vertical alignment and use standard arrow */
+      .return-button::before {
+        content: ''; /* Remove text content */
+        display: block;
+        width: 12px; /* Smaller size */
+        height: 12px; /* Smaller size */
+        border-left: 2px solid white; /* Thinner border */
+        border-bottom: 2px solid white; /* Thinner border */
+        transform: rotate(45deg); /* Rotate to make a left-pointing arrow */
+        margin-right: -4px; /* Adjust position */
+      }
+      
+      .return-button:hover {
+        background-color: rgba(211, 211, 211, 0.3); /* Same color with 60% opacity */
+        transform: scale(1.1);
+      }
+    `;
+    document.head.appendChild(styleTag);
+
+    // Create wrapper div
+    const wrapper = document.createElement('div');
+    wrapper.className = 'return-button-wrapper';
+
+    // Create button
+    const button = document.createElement('button');
+    button.className = 'return-button';
+    // Don't set textContent, as we're using ::before pseudo-element
+    button.setAttribute('aria-label', 'Return to gallery');
+
+    // Add click handler
+    button.onclick = e => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (onClose) onClose();
+    };
+
+    // Add to DOM outside React tree
+    wrapper.appendChild(button);
+    document.body.appendChild(wrapper);
+
+    // Remove onMouseMove handler from parent container
+    const videoContainer = document.querySelector('.video-fullscreen');
+    if (videoContainer) {
+      videoContainer.onmousemove = null;
+    }
+
+    // Clean up on unmount
+    return () => {
+      document.head.removeChild(styleTag);
+      document.body.removeChild(wrapper);
+    };
+  }, [onClose]);
+
   return (
-    <div 
+    <div
       className={`video-fullscreen ${className}`}
       style={{
         position: 'fixed',
@@ -119,73 +206,21 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
       onTouchStart={handleInteraction}
       onKeyDown={handleInteraction}
     >
-      {/* Close button */}
-      <button
-        onClick={(e) => {
-          // Call the interaction handler
-          handleInteraction();
-          // Call the close handler but don't stop propagation
-          if (onClose) {
-            onClose();
-          }
-        }}
-        aria-label="Close"
-        className="close-button"
-        style={{
-          position: 'absolute',
-          top: '20px',
-          right: '20px',
-          width: '46px',
-          height: '46px',
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          border: 'none',
-          borderRadius: '50%',
-          color: '#fff',
-          fontSize: '20px',
-          cursor: 'pointer',
-          zIndex: 10,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          opacity: 0,
-          transform: 'scale(0.9)',
-          animation: 'scaleIn 400ms ease-out 300ms forwards',
-          transition: 'background-color 250ms ease, transform 250ms ease',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(74, 144, 226, 0.7)';
-          e.currentTarget.style.transform = 'scale(1.1)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.5)';
-          e.currentTarget.style.transform = 'scale(1)';
-        }}
-      >
-        <span style={{
-          display: 'inline-block',
-          lineHeight: 1,
-          transition: 'transform 250ms ease',
-        }}>✕</span>
-
-        <style>{`
-          @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-          }
-        `}</style>
-      </button>
+      {/* No buttons here - using imperative DOM button instead */}
 
       {/* Video element - filling available space */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        alignItems: 'stretch',
-        justifyContent: 'stretch',
-        position: 'relative',
-        width: '100%',
-        height: '100%',
-        overflow: 'hidden',
-      }}>
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'stretch',
+          justifyContent: 'stretch',
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          overflow: 'hidden',
+        }}
+      >
         <video
           ref={videoRef}
           style={{
@@ -195,92 +230,110 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
             objectPosition: 'center',
             backgroundColor: '#000',
           }}
-          onClick={(e) => {
+          onClick={e => {
             // Just track interaction, no toggling play/pause
             handleInteraction();
           }}
         />
 
         {/* Metadata overlay at the bottom */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          padding: '30px',
-          background: 'linear-gradient(transparent, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.9))',
-          color: '#fff',
-          textShadow: '0 2px 4px rgba(0,0,0,0.7)',
-          zIndex: 5,
-          animation: 'fadeInUp 500ms ease-out forwards',
-        }}>
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            padding: '30px',
+            background: 'linear-gradient(transparent, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.9))',
+            color: '#fff',
+            textShadow: '0 2px 4px rgba(0,0,0,0.7)',
+            zIndex: 5,
+            animation: 'fadeInUp 500ms ease-out forwards',
+          }}
+        >
           {/* First row - Sprite title (larger font) */}
-          <h2 style={{ 
-            margin: 0, 
-            fontSize: '2.5rem', 
-            fontWeight: 'bold',
-            letterSpacing: '0.5px',
-            marginBottom: '1rem',
-            animation: 'fadeInUp 600ms ease-out forwards',
-          }}>
+          <h2
+            style={{
+              margin: 0,
+              fontSize: '2.5rem',
+              fontWeight: 'bold',
+              letterSpacing: '0.5px',
+              marginBottom: '1rem',
+              animation: 'fadeInUp 600ms ease-out forwards',
+            }}
+          >
             {sprite.title}
           </h2>
-          
+
           {/* Second row - Genre, Song Title, Methods Used */}
-          <div style={{ 
-            display: 'flex',
-            alignItems: 'center', 
-            gap: '20px',
-            fontSize: '1.2rem',
-            opacity: 0,
-            animation: 'fadeInUp 400ms ease-out 200ms forwards',
-          }}>
-            <div style={{
+          <div
+            style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-            }}>
-              <span style={{ 
-                backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-                padding: '2px 10px',
-                borderRadius: '4px',
-                fontSize: '0.9rem',
-                opacity: 0.8,
-              }}>
+              gap: '20px',
+              fontSize: '1.2rem',
+              opacity: 0,
+              animation: 'fadeInUp 400ms ease-out 200ms forwards',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <span
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  padding: '2px 10px',
+                  borderRadius: '4px',
+                  fontSize: '0.9rem',
+                  opacity: 0.8,
+                }}
+              >
                 Genre
               </span>
               <span>{sprite.genre}</span>
             </div>
-            
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}>
-              <span style={{ 
-                backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-                padding: '2px 10px',
-                borderRadius: '4px',
-                fontSize: '0.9rem',
-                opacity: 0.8,
-              }}>
+
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <span
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  padding: '2px 10px',
+                  borderRadius: '4px',
+                  fontSize: '0.9rem',
+                  opacity: 0.8,
+                }}
+              >
                 Music
               </span>
               <span>{sprite.songTitle}</span>
             </div>
-            
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}>
-              <span style={{ 
-                backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-                padding: '2px 10px',
-                borderRadius: '4px',
-                fontSize: '0.9rem',
-                opacity: 0.8,
-              }}>
+
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <span
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  padding: '2px 10px',
+                  borderRadius: '4px',
+                  fontSize: '0.9rem',
+                  opacity: 0.8,
+                }}
+              >
                 Animation
               </span>
               <span>{sprite.animationMethods}</span>
@@ -295,28 +348,31 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
           `}</style>
         </div>
 
-  
         {/* Loading indicator */}
         {!videoState.isLoaded && (
-          <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-            <div style={{
-              width: '60px',
-              height: '60px',
-              border: '5px solid rgba(255,255,255,0.2)',
-              borderRadius: '50%',
-              borderTop: '5px solid #fff',
-              animation: 'spin 1s linear infinite',
-              marginBottom: '1rem',
-            }}></div>
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <div
+              style={{
+                width: '60px',
+                height: '60px',
+                border: '5px solid rgba(255,255,255,0.2)',
+                borderRadius: '50%',
+                borderTop: '5px solid #fff',
+                animation: 'spin 1s linear infinite',
+                marginBottom: '1rem',
+              }}
+            ></div>
             <p style={{ color: '#fff' }}>Loading video...</p>
 
             <style>{`
@@ -328,7 +384,6 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
           </div>
         )}
       </div>
-
     </div>
   );
 };

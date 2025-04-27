@@ -72,7 +72,7 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       onMouseLeave={handleMouseLeave}
       style={{
         width: '100%', // Take full container width
-        paddingTop: '100%', // Create square aspect ratio
+        height: '100%', // Take full container height
         backgroundColor: 'transparent',
         borderRadius: '6px', // Slightly rounded corners
         overflow: 'hidden',
@@ -85,6 +85,9 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         transform: isHovered ? 'scale(1.03)' : 'scale(1)', // Slightly larger hover effect
         transition: `transform ${TIMING.standard}ms ${EASING.emphasized}`,
         willChange: 'transform',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
       {/* Video element */}
@@ -94,9 +97,6 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         playsInline
         loop
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
           width: '100%',
           height: '100%',
           objectFit: 'cover',
@@ -104,8 +104,6 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           borderRadius: '6px', // Match parent container's rounded corners
         }}
       />
-
-      {/* Text overlay removed as requested */}
 
       {/* Hover overlay effect */}
       {isHovered && !isActive && (

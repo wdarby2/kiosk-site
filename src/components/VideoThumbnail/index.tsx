@@ -73,7 +73,7 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       style={{
         width: '100%', // Take full container width
         paddingTop: '100%', // Create square aspect ratio
-        backgroundColor: '#222',
+        backgroundColor: 'transparent',
         borderRadius: '6px', // Slightly rounded corners
         overflow: 'hidden',
         position: 'relative',
@@ -101,7 +101,7 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           height: '100%',
           objectFit: 'cover',
           objectPosition: 'center center', // Explicitly center the video content
-          borderRadius: '12px', // Match parent container's rounded corners
+          borderRadius: '6px', // Match parent container's rounded corners
         }}
       />
 

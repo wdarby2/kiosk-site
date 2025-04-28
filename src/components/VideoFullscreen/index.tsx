@@ -8,6 +8,7 @@ interface VideoFullscreenProps {
   autoPlay?: boolean;
   className?: string;
   onInteraction?: () => void; // Add prop for interaction events
+  onVideoEnded?: () => void; // Add prop for video ended event
 }
 
 const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
@@ -16,6 +17,7 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
   autoPlay = true,
   className = '',
   onInteraction,
+  onVideoEnded,
 }) => {
   // Handler for user interactions
   const handleInteraction = () => {
@@ -32,6 +34,12 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
     playsInline: true,
     controls: false, // No controls
     forceProtocolCheck: true,
+    onEnded: () => {
+      console.log('VideoFullscreen: Video playback ended');
+      if (onVideoEnded) {
+        onVideoEnded();
+      }
+    },
   });
 
   // Handle keyboard events for escape only (to close the video)

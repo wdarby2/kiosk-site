@@ -69,11 +69,9 @@ const App: React.FC = () => {
     }
   };
 
-  // Effect to start/stop timer when page changes
+  // Effect to handle page changes - no longer auto-starts timer on SPRITE page
   useEffect(() => {
-    if (currentPage === Page.SPRITE) {
-      startInactivityTimer();
-    } else {
+    if (currentPage !== Page.SPRITE) {
       clearAllTimers();
     }
 
@@ -101,6 +99,14 @@ const App: React.FC = () => {
   const handleUserInteraction = () => {
     if (currentPage === Page.SPRITE) {
       resetInactivityTimer();
+    }
+  };
+
+  // Handle video ended event (to start inactivity timer)
+  const handleVideoEnded = () => {
+    console.log('App: Video ended, starting inactivity timer');
+    if (currentPage === Page.SPRITE) {
+      startInactivityTimer();
     }
   };
 
@@ -179,6 +185,7 @@ const App: React.FC = () => {
               sprite={selectedSprite}
               onClose={() => handlePageTransition(Page.HOME)}
               onUserInteraction={handleUserInteraction}
+              onVideoEnded={handleVideoEnded}
             />
 
             <style>{`

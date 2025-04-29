@@ -74,7 +74,7 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         width: '100%', // Take full container width
         height: '100%', // Take full container height
         backgroundColor: 'transparent',
-        borderRadius: '6px', // Slightly rounded corners
+        borderRadius: '10px', // Updated to a smaller radius
         overflow: 'hidden',
         position: 'relative',
         cursor: onClick ? 'pointer' : 'default',
@@ -88,6 +88,7 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        WebkitMaskImage: '-webkit-radial-gradient(white, black)', // Fix for Safari border-radius overflow issues
       }}
     >
       {/* Video element */}
@@ -101,7 +102,8 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           height: '100%',
           objectFit: 'cover',
           objectPosition: 'center center', // Explicitly center the video content
-          borderRadius: '6px', // Match parent container's rounded corners
+          borderRadius: '10px', // Match parent container's updated rounded corners
+          WebkitBorderRadius: '10px', // For better Safari compatibility
         }}
       />
 
@@ -148,7 +150,7 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       )}
 
 
-      {/* Animation keyframes */}
+      {/* Animation keyframes and styles */}
       <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
@@ -164,6 +166,18 @@ const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           0% { transform: scale(1); }
           50% { transform: scale(1.02); }
           100% { transform: scale(1); }
+        }
+        
+        /* Squircle effect with 60% smoothing */
+        .video-thumbnail {
+          border-radius: 10px;
+          --squircle-radius: 10px;
+          --squircle-smooth: 60%;
+          -webkit-mask-image: paint(squircle);
+        }
+        
+        video {
+          border-radius: 10px;
         }
       `}</style>
     </div>

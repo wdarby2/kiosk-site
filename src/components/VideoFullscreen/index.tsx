@@ -8,6 +8,7 @@ interface VideoFullscreenProps {
   autoPlay?: boolean;
   className?: string;
   onInteraction?: () => void; // Add prop for interaction events
+  onVideoEnded?: () => void; // Add prop for video ended event
 }
 
 const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
@@ -16,6 +17,7 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
   autoPlay = true,
   className = '',
   onInteraction,
+  onVideoEnded,
 }) => {
   // Handler for user interactions
   const handleInteraction = () => {
@@ -32,6 +34,12 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
     playsInline: true,
     controls: false, // No controls
     forceProtocolCheck: true,
+    onEnded: () => {
+      console.log('VideoFullscreen: Video playback ended');
+      if (onVideoEnded) {
+        onVideoEnded();
+      }
+    },
   });
 
   // Handle keyboard events for escape only (to close the video)
@@ -77,7 +85,10 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
             padding: '2rem',
           }}
         >
-          <h2 style={{ marginBottom: '1rem' }}>{sprite.title}</h2>
+          <h2 style={{ 
+            marginBottom: '1rem',
+            fontFamily: "'JetBrains Mono', monospace"
+          }}>{sprite.title}</h2>
           <p style={{ marginBottom: '2rem' }}>Unable to load video</p>
           <button
             onClick={onClose}
@@ -119,7 +130,7 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
         right: 20px;
         width: 46px;
         height: 46px;
-        background-color: rgba(211, 211, 211, 0.2); /* Light gray with 20% opacity */
+        background-color: rgba(255, 255, 255, 0.15); /* White with 15% opacity */
         border: none;
         border-radius: 50%;
         color: rgba(255, 255, 255, 1); /* White text */
@@ -147,7 +158,7 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
       }
       
       .return-button:hover {
-        background-color: rgba(211, 211, 211, 0.3); /* Same color with 60% opacity */
+        background-color: rgba(255, 255, 255, 0.25); /* White with 25% opacity */
         transform: scale(1.1);
       }
     `;
@@ -236,107 +247,145 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
           }}
         />
 
-        {/* Metadata overlay at the bottom */}
+        {/* Subtle gradient overlay - primarily at the bottom for text readability */}
         <div
           style={{
             position: 'absolute',
-            bottom: 0,
+            top: 0,
             left: 0,
             right: 0,
-            padding: '30px',
-            background: 'linear-gradient(transparent, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.9))',
+            bottom: 0,
+            background: `
+              linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.5) 100%)
+            `,
+            pointerEvents: 'none',
+            zIndex: 2,
+          }}
+        />
+
+        {/* Metadata overlay at the bottom - transparent with subtle text shadow */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '20px', // Closer to bottom
+            left: 0,
+            right: 0,
+            padding: '20px 40px',
+            backgroundColor: 'transparent',
             color: '#fff',
-            textShadow: '0 2px 4px rgba(0,0,0,0.7)',
+            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
             zIndex: 5,
             animation: 'fadeInUp 500ms ease-out forwards',
           }}
         >
-          {/* First row - Sprite title (larger font) */}
+          {/* Title (top-left) */}
           <h2
             style={{
               margin: 0,
               fontSize: '2.5rem',
               fontWeight: 'bold',
               letterSpacing: '0.5px',
-              marginBottom: '1rem',
+              marginBottom: '1rem', // Reduced space between title and metadata
               animation: 'fadeInUp 600ms ease-out forwards',
+              textShadow: '0 1px 3px rgba(0,0,0,0.5)', // Lighter shadow
+              fontFamily: "'JetBrains Mono', monospace",
             }}
           >
             {sprite.title}
           </h2>
 
-          {/* Second row - Genre, Song Title, Methods Used */}
+          {/* Three columns layout */}
           <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr 1fr',
               gap: '20px',
-              fontSize: '1.2rem',
               opacity: 0,
               animation: 'fadeInUp 400ms ease-out 200ms forwards',
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
+            {/* GENRE Column */}
+            <div>
               <span
                 style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                  padding: '2px 10px',
-                  borderRadius: '4px',
-                  fontSize: '0.9rem',
+                  display: 'block',
+                  fontSize: '0.75rem',
+                  letterSpacing: '1px',
+                  textTransform: 'uppercase',
+                  fontWeight: 'normal',
+                  marginBottom: '4px',
                   opacity: 0.8,
+                  textShadow: '0 1px 1px rgba(0,0,0,0.5)', // Reduced shadow
                 }}
               >
-                Genre
+                GENRE
               </span>
-              <span>{sprite.genre}</span>
+              <span
+                style={{
+                  display: 'block',
+                  fontSize: '1.2rem',
+                  fontWeight: 'normal',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.5)', // Reduced shadow
+                }}
+              >
+                {sprite.genre}
+              </span>
             </div>
 
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
+            {/* SONG TITLE Column */}
+            <div>
               <span
                 style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                  padding: '2px 10px',
-                  borderRadius: '4px',
-                  fontSize: '0.9rem',
+                  display: 'block',
+                  fontSize: '0.75rem',
+                  letterSpacing: '1px',
+                  textTransform: 'uppercase',
+                  fontWeight: 'normal',
+                  marginBottom: '4px',
                   opacity: 0.8,
+                  textShadow: '0 1px 1px rgba(0,0,0,0.5)', // Reduced shadow
                 }}
               >
-                Music
+                SONG TITLE
               </span>
-              <span>{sprite.songTitle}</span>
+              <span
+                style={{
+                  display: 'block',
+                  fontSize: '1.2rem',
+                  fontWeight: 'normal',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.5)', // Reduced shadow
+                }}
+              >
+                {sprite.songTitle}
+              </span>
             </div>
 
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
+            {/* METHODS USED Column */}
+            <div>
               <span
                 style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                  padding: '2px 10px',
-                  borderRadius: '4px',
-                  fontSize: '0.9rem',
+                  display: 'block',
+                  fontSize: '0.75rem',
+                  letterSpacing: '1px',
+                  textTransform: 'uppercase',
+                  fontWeight: 'normal',
+                  marginBottom: '4px',
                   opacity: 0.8,
+                  textShadow: '0 1px 1px rgba(0,0,0,0.5)', // Reduced shadow
                 }}
               >
-                Animation
+                METHODS USED
               </span>
-              <span>{sprite.animationMethods}</span>
+              <span
+                style={{
+                  display: 'block',
+                  fontSize: '1.2rem',
+                  fontWeight: 'normal',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.5)', // Reduced shadow
+                }}
+              >
+                {sprite.animationMethods}
+              </span>
             </div>
           </div>
 

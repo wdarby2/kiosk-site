@@ -147,9 +147,10 @@ const Home: React.FC<HomeProps> = ({ onSpriteSelect }) => {
           <h1 style={{ 
             textAlign: 'left',  // Left-align the title text
             margin: 0,  // No margin
-            fontSize: 'clamp(1.5rem, 2vw, 2.2rem)', // Increased font size for better prominence
+            fontSize: '40px', // Exactly 40px as requested
             lineHeight: 1.2, // Slightly increased line height
-            fontWeight: 'normal', // Reduce the visual weight
+            fontWeight: 'bold', // Bold weight
+            fontFamily: "'JetBrains Mono', monospace", // JetBrains Mono font
             width: 'auto', // Size based on content
             paddingLeft: '0', // No padding
           }}>

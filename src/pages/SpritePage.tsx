@@ -5,13 +5,15 @@ import { Sprite } from '../types';
 interface SpritePageProps {
   sprite: Sprite;
   onClose: () => void;
-  onUserInteraction?: () => void; // New prop for handling user interaction
+  onUserInteraction?: () => void; // Prop for handling user interaction
+  onVideoEnded?: () => void; // Prop for video ended event
 }
 
 const SpritePage: React.FC<SpritePageProps> = ({ 
   sprite, 
   onClose,
-  onUserInteraction 
+  onUserInteraction,
+  onVideoEnded
 }) => {
   if (!sprite) {
     return null;
@@ -43,6 +45,7 @@ const SpritePage: React.FC<SpritePageProps> = ({
         onClose={onClose}
         autoPlay={true}
         onInteraction={handleUserInteraction}
+        onVideoEnded={onVideoEnded}
       />
     </div>
   );

@@ -85,7 +85,10 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
             padding: '2rem',
           }}
         >
-          <h2 style={{ marginBottom: '1rem' }}>{sprite.title}</h2>
+          <h2 style={{ 
+            marginBottom: '1rem',
+            fontFamily: "'JetBrains Mono', monospace"
+          }}>{sprite.title}</h2>
           <p style={{ marginBottom: '2rem' }}>Unable to load video</p>
           <button
             onClick={onClose}
@@ -285,6 +288,7 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
               marginBottom: '1rem', // Reduced space between title and metadata
               animation: 'fadeInUp 600ms ease-out forwards',
               textShadow: '0 1px 3px rgba(0,0,0,0.5)', // Lighter shadow
+              fontFamily: "'JetBrains Mono', monospace",
             }}
           >
             {sprite.title}

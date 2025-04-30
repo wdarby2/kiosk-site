@@ -73,6 +73,8 @@ const App: React.FC = () => {
   useEffect(() => {
     if (currentPage !== Page.SPRITE) {
       clearAllTimers();
+      // Reset the video ended flag when leaving sprite page
+      videoHasEndedRef.current = false;
     }
 
     // Cleanup on unmount
@@ -91,13 +93,17 @@ const App: React.FC = () => {
   const goHome = () => {
     console.log('App: Navigating to HOME');
     clearAllTimers();
+    videoHasEndedRef.current = false;
     setCurrentPage(Page.HOME);
     setSelectedSprite(null);
   };
 
-  // Handle user interaction (to reset timer)
+  // Track whether video has ended
+  const videoHasEndedRef = useRef(false);
+
+  // Handle user interaction (to reset timer, but only if video has ended)
   const handleUserInteraction = () => {
-    if (currentPage === Page.SPRITE) {
+    if (currentPage === Page.SPRITE && videoHasEndedRef.current) {
       resetInactivityTimer();
     }
   };
@@ -106,6 +112,7 @@ const App: React.FC = () => {
   const handleVideoEnded = () => {
     console.log('App: Video ended, starting inactivity timer');
     if (currentPage === Page.SPRITE) {
+      videoHasEndedRef.current = true;
       startInactivityTimer();
     }
   };

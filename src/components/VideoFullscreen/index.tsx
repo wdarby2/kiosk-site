@@ -109,15 +109,15 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
     );
   }
 
-  // Add a transparent overlay to block all mouse events in the upper-right corner
+  // Add a button to the bottom-right corner
   React.useEffect(() => {
     // Create a style tag for our CSS
     const styleTag = document.createElement('style');
     styleTag.textContent = `
       .return-button-wrapper {
         position: fixed;
-        top: 0;
-        right: 0;
+        bottom: 20px;
+        right: 40px;
         width: 100px;
         height: 100px;
         z-index: 99999;
@@ -126,8 +126,8 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
       
       .return-button {
         position: absolute;
-        top: 20px;
-        right: 20px;
+        bottom: 19px; /* Align with the metadata text (adjusted to match the three-column grid) */
+        right: 0;
         width: 46px;
         height: 46px;
         background-color: rgba(255, 255, 255, 0.15); /* White with 15% opacity */

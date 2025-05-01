@@ -29,7 +29,7 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
   // Use our custom hook for video playback
   const [videoRef, videoState, videoControls] = useVideoPlayback(sprite.filename, {
     autoPlay: true, // Always autoplay
-    loop: true,
+    loop: false, // Set to false to ensure onEnded fires properly
     muted: false, // Fullscreen videos should have sound
     playsInline: true,
     controls: false, // No controls
@@ -39,6 +39,13 @@ const VideoFullscreen: React.FC<VideoFullscreenProps> = ({
       if (onVideoEnded) {
         onVideoEnded();
       }
+      // Manually restart the video if needed
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.currentTime = 0;
+          videoControls.play();
+        }
+      }, 100);
     },
   });
 

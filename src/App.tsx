@@ -3,7 +3,9 @@ import Home from './pages/Home';
 import SpritePage from './pages/SpritePage';
 import Navigation from './components/Navigation';
 import ErrorBoundary from './components/ErrorBoundary';
+import RefreshIndicator from './components/RefreshIndicator';
 import { Sprite } from './types';
+import useAutoRefresh from './hooks/useAutoRefresh';
 
 // Define available pages
 enum Page {
@@ -16,6 +18,13 @@ const App: React.FC = () => {
   // Application state
   const [currentPage, setCurrentPage] = useState<Page>(Page.HOME);
   const [selectedSprite, setSelectedSprite] = useState<Sprite | null>(null);
+
+  // Set up auto-refresh timer to reload the page every 30 minutes
+  // This helps prevent memory issues and ensure stability for long-running kiosks
+  useAutoRefresh({
+    interval: 30 * 60 * 1000, // 30 minutes in milliseconds
+    enabled: true,
+  });
 
   // Inactivity timer for the sprite page
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -234,6 +243,10 @@ const App: React.FC = () => {
     }
   };
 
+  // Automatically hide indicator in production mode
+  // Will show only in development mode when using Vite
+  const showRefreshIndicator = import.meta.env.DEV;
+
   return (
     <ErrorBoundary>
       <div className="app">
@@ -241,7 +254,8 @@ const App: React.FC = () => {
 
         {renderPage()}
 
-        {/* Inactivity Warning removed - auto-close behavior still works silently */}
+        {/* Conditionally render the refresh indicator based on environment */}
+        {showRefreshIndicator && <RefreshIndicator />}
       </div>
     </ErrorBoundary>
   );

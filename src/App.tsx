@@ -73,8 +73,9 @@ const App: React.FC = () => {
   useEffect(() => {
     if (currentPage !== Page.SPRITE) {
       clearAllTimers();
-      // Reset the video ended flag when leaving sprite page
+      // Reset the video ended flag and play count when leaving sprite page
       videoHasEndedRef.current = false;
+      videoPlayCountRef.current = 0;
     }
 
     // Cleanup on unmount
@@ -94,12 +95,15 @@ const App: React.FC = () => {
     console.log('App: Navigating to HOME');
     clearAllTimers();
     videoHasEndedRef.current = false;
+    videoPlayCountRef.current = 0; // Reset play count
     setCurrentPage(Page.HOME);
     setSelectedSprite(null);
   };
 
-  // Track whether video has ended
+  // Track whether video has ended and play count
   const videoHasEndedRef = useRef(false);
+  const videoPlayCountRef = useRef(0);
+  const MAX_PLAY_COUNT = 2; // Play video twice
 
   // Handle user interaction (to reset timer, but only if video has ended)
   const handleUserInteraction = () => {
@@ -108,12 +112,17 @@ const App: React.FC = () => {
     }
   };
 
-  // Handle video ended event (to start inactivity timer)
+  // Handle video ended event (to start inactivity timer after MAX_PLAY_COUNT)
   const handleVideoEnded = () => {
-    console.log('App: Video ended, starting inactivity timer');
     if (currentPage === Page.SPRITE) {
-      videoHasEndedRef.current = true;
-      startInactivityTimer();
+      videoPlayCountRef.current += 1;
+      console.log(`App: Video ended (play ${videoPlayCountRef.current}/${MAX_PLAY_COUNT})`);
+      
+      if (videoPlayCountRef.current >= MAX_PLAY_COUNT) {
+        console.log('App: Max play count reached, starting inactivity timer');
+        videoHasEndedRef.current = true;
+        startInactivityTimer();
+      }
     }
   };
 

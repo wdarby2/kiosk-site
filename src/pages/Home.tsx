@@ -154,7 +154,7 @@ const Home: React.FC<HomeProps> = ({ onSpriteSelect }) => {
             width: 'auto', // Size based on content
             paddingLeft: '0', // No padding
           }}>
-            Motion Study Sprites
+            Journey Into Sound
           </h1>
         </div>
         
